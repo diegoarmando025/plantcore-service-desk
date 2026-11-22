@@ -17,7 +17,7 @@
             <button class="nav-link btn" type="button" data-lte-toggle="sidebar" aria-label="Alternar menú"><i class="bi bi-list fs-5"></i></button>
             <span class="ms-3 text-secondary small d-none d-sm-inline">Centro de servicios corporativos</span>
             <div class="ms-auto d-flex align-items-center gap-3">
-                <span class="text-secondary small d-none d-md-inline">{{ auth()->user()->name }}</span>
+                <span class="text-secondary small d-none d-md-inline">{{ auth()->user()->is_portfolio_demo ? "Evaluador demo" : auth()->user()->name }}</span>
                 <form method="POST" action="{{ route('logout') }}">@csrf
                     <button type="submit" class="btn btn-sm btn-outline-secondary"><i class="bi bi-box-arrow-right me-1"></i> Salir</button>
                 </form>
