@@ -1,22 +1,52 @@
-# PlantCore Service Desk — instalación inicial controlada
+# PlantCore Service Desk — Hostinger deployment
 
-Estado: código preparado para validación; **NO se ha publicado en GitHub ni probado con MySQL en este entorno**. Este ZIP no corresponde a un commit remoto.
+> Maintained procedure. PHP 8.3 + Laravel 12. The previous notes in this repository were written before the first GitHub import and are no longer accurate.
 
-## Hostinger (solo Service Desk)
+## Files and configuration
 
-1. En hPanel verifica el directorio raíz real de `service-desk.devalejandre.com`; el respaldo contiene `public_html/service-desk/default.php`, pero no demuestra la configuración del subdominio.
-2. Si el document root es `/domains/devalejandre.com/public_html/service-desk`, coloca exclusivamente los archivos de `public_html/service-desk/` allí. Conserva `default.php` como copia de respaldo o elimínalo **solo tras validar** que el subdominio apunta a esa ruta.
-3. Coloca la carpeta `apps/service-desk/` en `/domains/devalejandre.com/apps/service-desk/`, fuera de la raíz pública. Comprueba que la ruta absoluta del `public_html/service-desk/index.php` coincide con la del servidor.
-4. Crea una base y un usuario MySQL nuevos, con permisos solo sobre esa base. No uses bases de Traceability o LPA.
-5. Crea `apps/service-desk/.env` a partir de `deploy/hostinger.env.example` y ajusta APP_URL, APP_KEY, DB_* y las sesiones. Nunca subas o reemplaces el `.env` de otra instalación.
-6. Requiere PHP >=8.3, Composer y SSH o una compilación externa con `vendor/` compatible. Este ZIP **no contiene vendor**. Instala dependencias de Composer, genera `APP_KEY` **una sola vez** y ejecuta migraciones tras respaldo. Para una instalación nueva sin datos: `bash deploy/deploy-hostinger.sh`.
-7. Desde SSH crea la cuenta propietaria con `php artisan service-desk:create-admin tu_correo@dominio.com --owner --force`; el comando solicita la contraseña de forma privada.
-8. Verifica HTTPS, `/login`, creación/asignación de ticket, notas internas, transferencia TI→RH y acceso por departamento. Comprueba que URLs `/.env`, `/vendor/autoload.php` y `/storage/logs` no son accesibles. No introducir datos reales en la demo.
+- Private Laravel code: `/home/u641948971/domains/devalejandre.com/apps/service-desk`
+- Public application files: `/home/u641948971/domains/devalejandre.com/public_html/service-desk` **only if** hPanel confirms that this is the subdomain document root.
+- Environment and data: preserve private `.env`, `storage/`, `vendor/` (unless explicitly updated), uploaded files, and the live database.
+- Each deployment must be tied to a specific GitHub commit SHA. Never extract the full Laravel project in the web document root.
 
-## Precauciones
+## Current database status
 
-- Nunca ejecutar `migrate:fresh`, `db:wipe`, `db:seed` ni `composer install` desde una carpeta distinta al Service Desk.
-- No sobrescribir `.env`, `storage/`, archivos de usuarios, ni respaldos de producción; este ZIP no incluye ninguno de esos datos.
-- Cada actualización debe tener su SHA verificado en GitHub antes de etiquetarse como versión sincronizada.
-- Reversión: restaurar archivos de la versión previa y respaldos MySQL. **Las migraciones no siempre son reversibles sin pérdida de datos.** No hacer rollback automático en producción.
-- Las notas internas están ligadas al departamento de origen: cuando se transfiere un ticket solo viajan las respuestas públicas. El administrador global conserva acceso a auditoría.
+On 2026-11-22, the operator reported that SSH `php artisan config:show database.default` returned `sqlite` for Service Desk, LPA, and Traceability. This is a CLI observation, not proof of the PHP web process configuration. Do not run migrations or switch drivers until you have verified the dedicated database and made a recovery backup.
+
+## Read-only checks before applying any update
+
+Use the same PHP binary intended for Service Desk:
+
+```bash
+cd /home/u641948971/domains/devalejandre.com/apps/service-desk
+/opt/alt/php83/usr/bin/php artisan --version
+/opt/alt/php83/usr/bin/php artisan config:show database.default
+/opt/alt/php83/usr/bin/php artisan migrate:status
+```
+
+The last command reads migration state but can fail if a driver or its credentials are invalid. Do not share secrets or `APP_KEY` in troubleshooting output.
+
+## Guarded deploy script (MySQL only)
+
+Only after a verified backup, correct database configuration and inspection of the ZIP contents:
+
+```bash
+cd /home/u641948971/domains/devalejandre.com/apps/service-desk
+PHP_BIN=/opt/alt/php83/usr/bin/php EXPECTED_DB_DATABASE=YOUR_SERVICE_DESK_DB bash deploy/deploy-hostinger.sh
+```
+
+The default invocation validates the production environment, MySQL connection selection and expected database **without writing to it**. After explicitly reviewing the output and backups, the operator can run:
+
+```bash
+PHP_BIN=/opt/alt/php83/usr/bin/php EXPECTED_DB_DATABASE=YOUR_SERVICE_DESK_DB CONFIRM_SERVICE_DESK_DEPLOY=yes bash deploy/deploy-hostinger.sh
+```
+
+This second invocation installs dependencies, checks platform requirements, runs non-destructive forward migrations and installs the catalog. Inspect migrations for compatibility and back up the database before executing it. Never use `migrate:fresh`, `db:wipe`, or production demo seeders.
+
+## Smoke tests
+
+Verify HTTPS, login/logout, ticket creation, assignment, messages, department transfer, internal note isolation and admin controls. Check that `/.env`, `/vendor/autoload.php` and `/storage/logs` are not publicly served.
+
+## Recovery
+
+Restore the prior verified release and application data from backups. Laravel database migration rollback is not automatically safe: analyze schema changes and use the database backup where required. Check the PHP web handler separately from the CLI binary. The installer does not assert that Hostinger web PHP was changed.
