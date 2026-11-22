@@ -21,7 +21,7 @@ class ServiceDeskWorkflowTest extends TestCase {
  public function test_requester_creates_ticket_agent_updates_and_internal_note_is_private():void {
   extract($this->fixture());
   $this->actingAs($requester)->post('/tickets',['title'=>'Falla de respaldo','description'=>'Se requiere diagnóstico del respaldo de base de datos.','department_id'=>$dept->id,'ticket_category_id'=>$category->id,'priority'=>'high'])->assertRedirect();
-  $ticket=Ticket::firstOrFail();$this->assertSame('SD-000001',$ticket->code);
+  $ticket=Ticket::firstOrFail();$this->assertSame('SD-'.str_pad((string)$ticket->id,6,'0',STR_PAD_LEFT),$ticket->code);
   $this->actingAs($agent)->put('/tickets/'.$ticket->id,['status'=>'in_progress','priority'=>'high','assignee_id'=>$agent->id])->assertRedirect();
   $this->actingAs($agent)->post('/tickets/'.$ticket->id.'/messages',['body'=>'Diagnóstico interno reservado','internal'=>1])->assertRedirect();
   $this->actingAs($requester)->get('/tickets/'.$ticket->id)->assertOk()->assertDontSee('Diagnóstico interno reservado');
