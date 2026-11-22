@@ -1,0 +1,17 @@
+:root{--bs-primary:#24445d;--bs-primary-rgb:36,68,93}
+.app-sidebar .brand-text{letter-spacing:-.02em}
+.app-content-header{padding-top:1.25rem;padding-bottom:.75rem}
+.app-content .service-desk-content{padding-bottom:1.5rem}
+.app-content .panel,.app-content .stat{box-shadow:none;border:1px solid var(--bs-border-color);border-radius:.65rem}
+.app-content .pageintro{margin-bottom:1rem}
+.app-content .stats{grid-template-columns:repeat(5,minmax(0,1fr))}
+.app-content .scrolltable{width:100%;overflow-x:auto}
+.app-content .scrolltable table{min-width:600px}
+.app-content .filters{gap:.75rem}
+.app-content .btn{font-size:.9rem}
+.login-page{min-height:100vh}
+.login-box{width:min(430px,calc(100vw - 2rem))}
+.login-box .login-card-body{padding:1.75rem}
+.login-box .form-control{min-height:44px}
+@media(max-width:1100px){.app-content .stats{grid-template-columns:repeat(3,minmax(0,1fr))}}
+@media(max-width:700px){.app-content .stats{grid-template-columns:repeat(2,minmax(0,1fr))}.app-content .filters{display:grid;grid-template-columns:1fr}.app-content .twocol,.app-content .admin-grid{display:block}.app-content .twocol>*{margin-bottom:1rem}}

@@ -1,0 +1,39 @@
+name: Package Service Desk AdminLTE for Hostinger
+on:
+  push:
+    branches: [main]
+    paths:
+      - "resources/views/**"
+      - "public/assets/**"
+      - "deploy/hostinger-public/**"
+permissions:
+  contents: write
+jobs:
+  release:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Build two-root Hostinger ZIP from exact commit
+        run: |
+          set -euo pipefail
+          mkdir -p package/apps/service-desk package/public_html/service-desk
+          git ls-files -z | while IFS= read -r -d '' file; do
+            case "$file" in
+              .github/*|tests/*|deploy/*|node_modules/*|package.json|package-lock.json|phpunit.xml|.env|.env.*|*.sqlite|*.log) continue ;;
+            esac
+            mkdir -p "package/apps/service-desk/$(dirname "$file")"
+            cp "$file" "package/apps/service-desk/$file"
+          done
+          cp -a deploy/hostinger-public/. package/public_html/service-desk/
+          test -s package/public_html/service-desk/assets/vendor/adminlte.min.css
+          test -s package/apps/service-desk/composer.lock
+          cd package
+          zip -qr "../PlantCore_Service_Desk_AdminLTE_${GITHUB_SHA:0:12}.zip" .
+          cd ..
+          unzip -t "PlantCore_Service_Desk_AdminLTE_${GITHUB_SHA:0:12}.zip" >/dev/null
+      - name: Publish downloadable release
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          short="${GITHUB_SHA:0:12}"
+          gh release create "service-desk-adminlte-$short" "PlantCore_Service_Desk_AdminLTE_$short.zip" --title "Service Desk AdminLTE · $short" --notes "Paquete para Hostinger construido desde commit $GITHUB_SHA. Extraer respetando apps/service-desk y public_html/service-desk. Conservar .env, storage de producción y bases de datos. No contiene vendor; conservar vendor existente. Esta versión solo modifica interfaz; sin migraciones nuevas."
