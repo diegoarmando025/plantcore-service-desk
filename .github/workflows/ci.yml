@@ -77,6 +77,7 @@ jobs:
           php -l scripts/sqlite-to-mysql.php
           touch database/database.sqlite
           php artisan migrate --database=sqlite --force
+          php artisan db:seed --database=sqlite --class=DatabaseSeeder --force
           php scripts/sqlite-to-mysql.php check
           php scripts/sqlite-to-mysql.php prepare
           php scripts/sqlite-to-mysql.php copy
