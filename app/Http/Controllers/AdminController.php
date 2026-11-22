@@ -14,7 +14,8 @@ class AdminController extends Controller {
  public function index(Request $r):View {
   $this->guard($r);$departments=Department::with('teams','categories')->orderBy('name')->get();
   $users=User::where('active',true)->orderBy('name')->get();
-  return view('admin.index',compact('departments','users'));
+  $demoTicketCount = $r->user()->is_owner ? \App\Models\Ticket::query()->where('is_portfolio_demo', true)->count() : null;
+  return view('admin.index',compact('departments','users','demoTicketCount'));
  }
  public function department(Request $r):RedirectResponse {
   $this->guard($r);$data=$r->validate(['name'=>['required','string','max:120'],'code'=>['required','alpha_dash','max:30',Rule::unique('departments','code')]]);
