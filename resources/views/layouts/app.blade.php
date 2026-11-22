@@ -7,7 +7,7 @@
     <link rel="stylesheet" href="{{ asset('assets/vendor/bootstrap.min.css') }}">
     <link rel="stylesheet" href="{{ asset('assets/vendor/bootstrap-icons.css') }}">
     <link rel="stylesheet" href="{{ asset('assets/vendor/adminlte.min.css') }}">
-    <link rel="stylesheet" href="{{ asset('assets/adminlte-overrides.css') }}?v={{ substr(hash_file('sha256', public_path('assets/adminlte-overrides.css')), 0, 12) }}">
+    <link rel="stylesheet" href="{{ asset('assets/adminlte-overrides.css') }}?v=adminlte-fix-20261122">
 </head>
 <body class="layout-fixed sidebar-expand-lg bg-body-tertiary" data-bs-theme="light">
 <div class="app-wrapper">
