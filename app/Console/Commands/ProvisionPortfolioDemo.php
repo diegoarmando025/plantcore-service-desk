@@ -24,9 +24,7 @@ class ProvisionPortfolioDemo extends Command {
             $this->error('Exactly one protected owner is required.'); return self::FAILURE;
         }
         $email = 'portfolio.demo@service-desk.example.invalid';
-        if (User::where('is_portfolio_demo', true)->where('email','!=',$email)->exists()) {
-            $this->error('Another demo identity already exists.'); return self::FAILURE;
-        }
+        // Several fictional agents may be marked as demo identities; only the reserved visitor identity is used for sign-in.
         $existing = User::where('email',$email)->first();
         if ($existing && ! $existing->is_portfolio_demo) {
             $this->error('Reserved email is already taken by a regular account.'); return self::FAILURE;

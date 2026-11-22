@@ -87,6 +87,24 @@ class InteractivePortfolioDemoTest extends TestCase {
         ]);
     }
 
+    public function test_demo_can_assign_a_ticket_to_fictional_department_agent(): void {
+        extract($this->fixture());
+        $agent = User::where('email', 'portfolio.ti@service-desk.example.invalid')->firstOrFail();
+        $ticket = Ticket::where('is_portfolio_demo',true)
+            ->where('department_id', $departments['TI']->id)->firstOrFail();
+        $this->actingAs($demo)->get("/tickets/$ticket->id")
+            ->assertOk()->assertSee('Soporte de TI');
+        $this->actingAs($demo)->put("/tickets/$ticket->id",[
+            'status'=>'in_progress', 'priority'=>'high',
+            'assignee_id'=>$agent->id,
+        ])->assertRedirect();
+        $this->assertDatabaseHas('tickets', [
+            'id'=>$ticket->id, 'assignee_id'=>$agent->id, 'is_portfolio_demo'=>true,
+        ]);
+        $this->assertTrue($agent->is_portfolio_demo);
+        $this->assertFalse($agent->is_owner);
+    }
+
     public function test_demo_cannot_read_or_modify_real_ticket_or_manage_users(): void {
         extract($this->fixture());
         $category=TicketCategory::where('department_id',$departments['TI']->id)->firstOrFail();

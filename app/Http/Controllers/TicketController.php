@@ -58,7 +58,7 @@ class TicketController extends Controller {
     }), 'messages.user:id,name',
     'activities.user:id,name']);
   $users=$isAgent?User::query()->where('active',true)->whereIn('id',DB::table('department_user')->where('department_id',$ticket->department_id)->pluck('user_id'))->orderBy('name')->get(['id','name']):collect();
-  if($isAgent && $request->user()->is_portfolio_demo)$users=User::whereKey($request->user()->id)->get(['id','name']);
+  if($isAgent && $request->user()->is_portfolio_demo)$users=User::query()->where('is_portfolio_demo',true)->where('active',true)->where('role','agent')->whereIn('id',DB::table('department_user')->where('department_id',$ticket->department_id)->pluck('user_id'))->orderBy('name')->get(['id','name']);
   if($isAgent && $request->user()->isAdmin())$users=User::where('active',true)->whereIn('role',['agent','admin'])->orderBy('name')->get(['id','name']);
   $teams=$isAgent?Team::where('department_id',$ticket->department_id)->where('active',true)->orderBy('name')->get(['id','name']):collect();
   $departments=$isAgent?Department::where('active',true)->orderBy('name')->get(['id','name']):collect();
@@ -88,7 +88,7 @@ class TicketController extends Controller {
    if($assigneeId!==null){
     $assignee=User::whereKey($assigneeId)->where('active',true)->firstOrFail();
     abort_unless($assignee->isAgent() && ($assignee->isAdmin() || $assignee->departments()->whereKey($locked->department_id)->exists()),422,'Responsable fuera del departamento.');
-    if ($request->user()->is_portfolio_demo) abort_unless($assignee->id === $request->user()->id && $assignee->is_portfolio_demo,422,'Solo el usuario ficticio puede recibir tickets de evaluación.');
+    if ($request->user()->is_portfolio_demo) abort_unless($assignee->is_portfolio_demo && $assignee->role === 'agent' && $assignee->departments()->whereKey($locked->department_id)->exists(),422,'Solo los agentes ficticios del departamento pueden recibir tickets de evaluación.');
     if (! $request->user()->is_portfolio_demo) abort_unless(! $assignee->is_portfolio_demo,422,'No se puede asignar un ticket operativo a una cuenta demo.');
     if($teamId!==null && !$assignee->isAdmin())abort_unless($assignee->departments()->whereKey($locked->department_id)->exists() && DB::table('team_user')->where('team_id',$teamId)->where('user_id',$assigneeId)->exists(),422,'El responsable no pertenece al equipo.');
    }

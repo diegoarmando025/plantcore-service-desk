@@ -12,7 +12,7 @@ class ResetPortfolioDemo extends Command {
     protected $description = 'Reset ONLY tickets explicitly marked as portfolio demo.';
 
     public function handle(): int {
-        $demo=User::where('is_portfolio_demo', true)->where('is_owner',false)->get();
+        $demo=User::where('email','portfolio.demo@service-desk.example.invalid')->where('is_portfolio_demo', true)->where('is_owner',false)->get();
         if ($demo->count() !== 1) {
             $this->error('Exactly one demo account required.'); return self::FAILURE;
         }
