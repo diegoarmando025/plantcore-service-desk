@@ -214,4 +214,44 @@ class InteractivePortfolioDemoTest extends TestCase {
         $this->post('/demo/entrar')->assertStatus(503);
         $this->assertGuest();
     }
+    public function test_owner_can_add_missing_fictional_tickets_without_changing_existing_records(): void {
+        extract($this->fixture());
+        $original = Ticket::where('is_portfolio_demo', true)->orderBy('id')->take(7)->get();
+        $keepIds = $original->pluck('id')->all();
+        $removeIds = Ticket::where('is_portfolio_demo', true)->whereNotIn('id', $keepIds)->pluck('id');
+        DB::table('ticket_messages')->whereIn('ticket_id', $removeIds)->delete();
+        DB::table('ticket_activities')->whereIn('ticket_id', $removeIds)->delete();
+        Ticket::whereIn('id', $removeIds)->delete();
+
+        $originalTitle = $original->first()->title;
+        $this->assertSame(7, Ticket::where('is_portfolio_demo', true)->count());
+        $this->actingAs($owner)->get('/admin')->assertOk()
+            ->assertSee('7</strong> solicitudes ficticias', false)
+            ->assertSee('Completar escenario');
+
+        $this->actingAs($owner)->post('/admin/portfolio-demo/complete', [
+            'confirmation' => 'COMPLETAR DEMO',
+        ])->assertRedirect()->assertSessionHas('ok');
+        $this->assertSame(25, Ticket::where('is_portfolio_demo', true)->count());
+        $this->assertSame($originalTitle, Ticket::findOrFail($original->first()->id)->title);
+        $this->assertTrue(collect($keepIds)->every(fn ($id) => Ticket::whereKey($id)->exists()));
+
+        $this->actingAs($owner)->post('/admin/portfolio-demo/complete', [
+            'confirmation' => 'COMPLETAR DEMO',
+        ])->assertRedirect()->assertSessionHas('ok');
+        $this->assertSame(25, Ticket::where('is_portfolio_demo', true)->count());
+    }
+
+    public function test_public_reviewer_cannot_invoke_or_view_owner_demo_maintenance(): void {
+        extract($this->fixture());
+        $this->actingAs($demo)->post('/admin/portfolio-demo/complete', [
+            'confirmation' => 'COMPLETAR DEMO',
+        ])->assertForbidden();
+        $this->actingAs($demo)->get('/admin')->assertForbidden();
+        $this->actingAs($owner)->post('/admin/portfolio-demo/complete', [
+            'confirmation' => 'WRONG',
+        ])->assertSessionHasErrors('confirmation');
+        $this->assertSame(25, Ticket::where('is_portfolio_demo', true)->count());
+    }
+
 }
