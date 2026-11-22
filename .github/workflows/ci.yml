@@ -53,6 +53,11 @@ jobs:
         run: |
           cp .env.example .env
           PHP_BIN="$(command -v php)" EXPECTED_DB_DATABASE=plantcore_service_desk_test bash deploy/deploy-hostinger.sh
+      - name: Check Hostinger release archive
+        run: |
+          bash -n scripts/package-hostinger.sh
+          bash scripts/package-hostinger.sh "$GITHUB_SHA"
+          sha256sum -c "PlantCore_Service_Desk_${GITHUB_SHA:0:12}.zip.sha256"
       - name: Run feature tests on MySQL
         env:
           APP_ENV: testing
