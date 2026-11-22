@@ -7,10 +7,9 @@
     <link rel="stylesheet" href="{{ asset('assets/vendor/bootstrap.min.css') }}">
     <link rel="stylesheet" href="{{ asset('assets/vendor/bootstrap-icons.css') }}">
     <link rel="stylesheet" href="{{ asset('assets/vendor/adminlte.min.css') }}">
-    <link rel="stylesheet" href="{{ asset('assets/app.css') }}">
-    <link rel="stylesheet" href="{{ asset('assets/adminlte-overrides.css') }}">
+    <link rel="stylesheet" href="{{ asset('assets/adminlte-overrides.css') }}?v={{ substr(hash_file('sha256', public_path('assets/adminlte-overrides.css')), 0, 12) }}">
 </head>
-<body class="layout-fixed sidebar-expand-lg bg-body-tertiary">
+<body class="layout-fixed sidebar-expand-lg bg-body-tertiary" data-bs-theme="light">
 <div class="app-wrapper">
     <nav class="app-header navbar navbar-expand bg-body border-bottom">
         <div class="container-fluid">
@@ -48,7 +47,7 @@
     </aside>
     <main class="app-main">
         <div class="app-content-header"><div class="container-fluid">
-            <h1 class="h4 mb-0">@yield('heading', 'Panel general')</h1>
+            <h1 class="h4 mb-0 fw-semibold text-body">@yield('heading', 'Panel general')</h1>
         </div></div>
         <div class="app-content"><div class="container-fluid service-desk-content">
             @if(auth()->user()->is_portfolio_demo)
