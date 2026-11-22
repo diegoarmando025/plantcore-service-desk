@@ -26,7 +26,7 @@
        </div>
        <p class="mb-2 fw-semibold small" style="overflow-wrap:anywhere">{{ $ticket->title }}</p>
        <div class="small text-secondary mb-1"><i class="bi bi-building me-1"></i>{{ $ticket->department?->name ?? 'Sin departamento' }}</div>
-       <div class="small text-secondary mb-2"><i class="bi bi-person me-1"></i>{{ $ticket->assignee?->name ?? 'Sin asignar' }}</div>
+       <div class="small text-secondary mb-2"><i class="bi bi-person me-1"></i>{{ $ticket->assignee?->email === 'portfolio.demo@service-desk.example.invalid' ? 'Evaluador demo' : ($ticket->assignee?->name ?? 'Sin asignar') }}</div>
        @if($ticket->due_at)
         <div class="small {{ $ticket->due_at->isPast() && !in_array($ticket->status,['resolved','closed']) ? 'text-danger fw-semibold' : 'text-secondary' }} mb-2">
           <i class="bi bi-clock me-1"></i>{{ $ticket->due_at->format('d/m/Y H:i') }}
