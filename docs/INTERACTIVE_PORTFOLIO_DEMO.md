@@ -6,7 +6,7 @@ The demo uses the same Laravel app and MySQL database as the owner. **It is not 
 
 - On \`/login\`, click **Entrar como administrador demo**; the server signs in a dedicated, non-owner **agent** account without publishing a password.
 - The user is redirected to \`/guia\` and can use the real dashboard, ticket creation, ticket messages, internal notes, status changes, assignments and department transfers.
-- The demo account has membership in each of the five sample departments, and can assign demo tickets **only to itself**.
+- The demo account has membership in each of the five sample departments, and can assign demo tickets to **five fictional agents**, one per department (and to itself). No real operational account may receive demo assignments.
 - Demo tickets are tagged \`is_portfolio_demo=1\`. Non-demo accounts (except the owner) cannot list or access them. The demo account cannot list or access ordinary tickets or manage users and configuration.
 - Demo users share one account and one dataset: changes are visible to other visitors and may persist until manual reset. Never enter real information. **This is not per-visitor isolation or a production multi-tenant SaaS design.**
 
