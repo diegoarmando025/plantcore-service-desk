@@ -1,0 +1,20 @@
+<?php
+use Illuminate\Database\Migrations\Migration;
+use Illuminate\Database\Schema\Blueprint;
+use Illuminate\Support\Facades\Schema;
+return new class extends Migration {
+ public function up():void {
+  Schema::create('users',function(Blueprint $t){$t->id();$t->string('name');$t->string('email')->unique();$t->timestamp('email_verified_at')->nullable();$t->string('password');$t->string('role',20)->default('requester');$t->boolean('active')->default(true);$t->boolean('is_owner')->default(false);$t->rememberToken();$t->timestamps();});
+  Schema::create('password_reset_tokens',function(Blueprint $t){$t->string('email')->primary();$t->string('token');$t->timestamp('created_at')->nullable();});
+  Schema::create('sessions',function(Blueprint $t){$t->string('id')->primary();$t->foreignId('user_id')->nullable()->index();$t->string('ip_address',45)->nullable();$t->text('user_agent')->nullable();$t->longText('payload');$t->integer('last_activity')->index();});
+  Schema::create('departments',function(Blueprint $t){$t->id();$t->string('name');$t->string('code',30)->unique();$t->text('description')->nullable();$t->boolean('active')->default(true);$t->timestamps();});
+  Schema::create('department_user',function(Blueprint $t){$t->foreignId('department_id')->constrained()->cascadeOnDelete();$t->foreignId('user_id')->constrained()->cascadeOnDelete();$t->string('role',20)->default('agent');$t->primary(['department_id','user_id']);});
+  Schema::create('teams',function(Blueprint $t){$t->id();$t->foreignId('department_id')->constrained()->restrictOnDelete();$t->string('name');$t->string('code',30);$t->boolean('active')->default(true);$t->timestamps();$t->unique(['department_id','code']);$t->unique(['id','department_id']);});
+  Schema::create('team_user',function(Blueprint $t){$t->foreignId('team_id')->constrained()->cascadeOnDelete();$t->foreignId('user_id')->constrained()->cascadeOnDelete();$t->primary(['team_id','user_id']);});
+  Schema::create('ticket_categories',function(Blueprint $t){$t->id();$t->foreignId('department_id')->constrained()->restrictOnDelete();$t->foreignId('team_id')->nullable()->constrained()->nullOnDelete();$t->string('name');$t->string('code',30);$t->unsignedSmallInteger('sla_hours')->default(48);$t->boolean('active')->default(true);$t->timestamps();$t->unique(['department_id','code']);});
+  Schema::create('tickets',function(Blueprint $t){$t->id();$t->string('code',25)->nullable()->unique();$t->string('title',180);$t->text('description');$t->foreignId('requester_id')->constrained('users')->restrictOnDelete();$t->foreignId('department_id')->constrained()->restrictOnDelete();$t->foreignId('team_id')->nullable()->constrained()->nullOnDelete();$t->foreignId('ticket_category_id')->constrained()->restrictOnDelete();$t->foreignId('assignee_id')->nullable()->constrained('users')->nullOnDelete();$t->string('priority',20)->default('normal');$t->string('status',20)->default('open');$t->timestamp('due_at')->nullable();$t->timestamp('resolved_at')->nullable();$t->timestamp('closed_at')->nullable();$t->timestamps();$t->index(['department_id','status','priority']);$t->index(['assignee_id','status']);});
+  Schema::create('ticket_messages',function(Blueprint $t){$t->id();$t->foreignId('ticket_id')->constrained()->cascadeOnDelete();$t->foreignId('user_id')->constrained()->restrictOnDelete();$t->foreignId('department_id')->nullable()->constrained()->restrictOnDelete();$t->text('body');$t->boolean('internal')->default(false);$t->timestamps();$t->index(['ticket_id','created_at']);});
+  Schema::create('ticket_activities',function(Blueprint $t){$t->id();$t->foreignId('ticket_id')->constrained()->cascadeOnDelete();$t->foreignId('user_id')->constrained()->restrictOnDelete();$t->string('action',40);$t->json('details')->nullable();$t->timestamps();$t->index(['ticket_id','created_at']);});
+ }
+ public function down():void { foreach(['ticket_activities','ticket_messages','tickets','ticket_categories','team_user','teams','department_user','departments','sessions','password_reset_tokens','users'] as $name) Schema::dropIfExists($name); }
+};
