@@ -69,12 +69,20 @@ class TicketController extends Controller {
   TicketAccess::view($request->user(),$ticket);
   $data=$request->validate(['body'=>['required','string','min:2','max:10000'],'internal'=>['sometimes','boolean']]);
   $internal=(bool)($data['internal']??false);
-  if($internal) TicketAccess::handle($request->user(),$ticket);
-  abort_if($ticket->status==='closed',409,'El ticket está cerrado.');
   DB::transaction(function()use($request,$ticket,$data,$internal){
-   $ticket->messages()->create(['user_id'=>$request->user()->id,'body'=>$data['body'],'internal'=>$internal,'department_id'=>$ticket->department_id]);
-   $ticket->activities()->create(['user_id'=>$request->user()->id,'action'=>$internal?'internal_note':'reply']);
-  });
+   $locked=Ticket::query()->lockForUpdate()->findOrFail($ticket->id);
+   TicketAccess::view($request->user(),$locked);
+   if($internal) TicketAccess::handle($request->user(),$locked);
+   abort_if($locked->status==='closed',409,'El ticket está cerrado.');
+   $locked->messages()->create([
+    'user_id'=>$request->user()->id,'body'=>$data['body'],
+    'internal'=>$internal,'department_id'=>$locked->department_id,
+   ]);
+   $locked->activities()->create([
+    'user_id'=>$request->user()->id,
+    'action'=>$internal?'internal_note':'reply',
+   ]);
+  },3);
   return back()->with('ok',$internal?'Nota interna agregada.':'Respuesta publicada.');
  }
  public function update(Request $request,Ticket $ticket):RedirectResponse {
@@ -82,6 +90,7 @@ class TicketController extends Controller {
   $data=$request->validate(['status'=>['required',Rule::in(Ticket::STATUSES)],'priority'=>['required',Rule::in(Ticket::PRIORITIES)],'team_id'=>['nullable','integer'],'assignee_id'=>['nullable','integer']]);
   DB::transaction(function()use($ticket,$request,$data){
    $locked=Ticket::whereKey($ticket->id)->lockForUpdate()->firstOrFail();
+   TicketAccess::handle($request->user(),$locked);
    abort_if($locked->status==='closed',409,'Un ticket cerrado no puede modificarse.');
    $teamId=$data['team_id']??null;$assigneeId=$data['assignee_id']??null;
    if($teamId!==null)abort_unless(Team::where('id',$teamId)->where('department_id',$locked->department_id)->where('active',true)->exists(),422,'Equipo inválido.');
