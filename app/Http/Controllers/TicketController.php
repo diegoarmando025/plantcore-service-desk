@@ -56,7 +56,7 @@ class TicketController extends Controller {
       if ($request->user()->isAdmin()) $visible->orWhere('internal',true);
       elseif (TicketAccess::handles($request->user(),$ticket->department_id)) $visible->orWhere(fn($internal)=>$internal->where('internal',true)->where('department_id',$ticket->department_id));
     }), 'messages.user:id,name',
-    'activities.user:id,name']);
+    'activities.user:id,name','attachments.user:id,name']);
   $users=$isAgent?User::query()->where('active',true)->whereIn('id',DB::table('department_user')->where('department_id',$ticket->department_id)->pluck('user_id'))->orderBy('name')->get(['id','name']):collect();
   if($isAgent && $request->user()->is_portfolio_demo)$users=User::query()->where('is_portfolio_demo',true)->where('active',true)->where('role','agent')->whereIn('id',DB::table('department_user')->where('department_id',$ticket->department_id)->pluck('user_id'))->orderBy('name')->get(['id','name']);
   if($isAgent && $request->user()->isAdmin())$users=User::where('active',true)->whereIn('role',['agent','admin'])->orderBy('name')->get(['id','name']);

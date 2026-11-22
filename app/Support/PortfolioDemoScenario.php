@@ -5,8 +5,10 @@ namespace App\Support;
 use App\Models\Department;
 use App\Models\Ticket;
 use App\Models\TicketCategory;
+use App\Models\TicketAttachment;
 use App\Models\User;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Storage;
 use RuntimeException;
 
 final class PortfolioDemoScenario {
@@ -92,7 +94,13 @@ final class PortfolioDemoScenario {
 
     public static function reset(User $demo): int {
         if (! $demo->is_portfolio_demo || $demo->is_owner) throw new RuntimeException('Invalid demo identity.');
-        return DB::transaction(function () use ($demo): int {
+        // Capture private file paths first; remove files only after a successful DB reset.
+        // The attachments table cascades with explicitly flagged demo tickets only.
+        $paths = TicketAttachment::query()
+            ->whereHas('ticket', fn ($query) => $query->where('is_portfolio_demo', true))
+            ->pluck('path')->all();
+
+        $deleted = DB::transaction(function () use ($demo): int {
             $ids = Ticket::where('is_portfolio_demo', true)->pluck('id');
             $count = $ids->count();
             DB::table('ticket_messages')->whereIn('ticket_id', $ids)->delete();
@@ -101,5 +109,10 @@ final class PortfolioDemoScenario {
             self::seed($demo);
             return $count;
         }, 3);
+
+        if ($paths && ! Storage::disk('local')->delete($paths)) {
+            report(new RuntimeException('Demo reset succeeded in DB, but private attachment cleanup failed.'));
+        }
+        return $deleted;
     }
 }

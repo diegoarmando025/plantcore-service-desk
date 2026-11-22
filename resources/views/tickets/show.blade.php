@@ -30,6 +30,27 @@
    <div class="card-header"><h2 class="card-title fw-semibold"><i class="bi bi-card-text me-2"></i>Descripción</h2></div>
    <div class="card-body"><p class="mb-0" style="white-space:pre-wrap;overflow-wrap:anywhere">{{ $ticket->description }}</p></div>
   </div>
+  <div class="card shadow-sm mb-3">
+   <div class="card-header"><h2 class="card-title fw-semibold"><i class="bi bi-paperclip me-2"></i>Evidencias adjuntas</h2></div>
+   <div class="card-body">
+    @forelse($ticket->attachments as $attachment)
+     <div class="d-flex align-items-center justify-content-between flex-wrap gap-2 border-bottom py-2">
+      <div class="small"><i class="bi bi-file-earmark me-2"></i><span class="fw-semibold">{{ $attachment->original_name }}</span>
+       <span class="text-secondary ms-2">{{ number_format($attachment->size / 1024, 1) }} KB · {{ $attachment->user?->name }}</span></div>
+      <a class="btn btn-sm btn-outline-primary" href="{{ route('tickets.attachments.download',[$ticket,$attachment]) }}"><i class="bi bi-download me-1"></i>Descargar</a>
+     </div>
+    @empty<p class="text-secondary small">No se han adjuntado evidencias.</p>@endforelse
+    @if($ticket->status !== 'closed')
+     <form method="POST" action="{{ route('tickets.attachments.store',$ticket) }}" enctype="multipart/form-data" class="mt-3">
+      @csrf
+      <label for="evidence_file" class="form-label fw-semibold">Adjuntar evidencia</label>
+      <input class="form-control" id="evidence_file" name="attachment" type="file" accept=".pdf,.png,.jpg,.jpeg,.txt" required>
+      <p class="form-text mb-2">PDF, PNG, JPG o TXT · Hasta 5 MB por archivo · Máximo 12 por ticket</p>
+      <button type="submit" class="btn btn-outline-primary"><i class="bi bi-upload me-1"></i>Subir archivo</button>
+     </form>
+    @endif
+   </div>
+  </div>
   <div class="card shadow-sm">
    <div class="card-header"><h2 class="card-title fw-semibold"><i class="bi bi-chat-square-text me-2"></i>Conversación</h2></div>
    <div class="card-body">
