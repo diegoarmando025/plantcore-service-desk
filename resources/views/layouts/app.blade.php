@@ -3,11 +3,12 @@
 <head>
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
-    <title>@yield('title', 'Service Desk') · PlantCore</title>
+    <title>@yield('title', 'Service Desk') · DevAlejandre</title>
+    <link rel="icon" href="https://devalejandre.com/assets/brand/favicon.ico" sizes="any">
     <link rel="stylesheet" href="{{ asset('assets/vendor/bootstrap.min.css') }}">
     <link rel="stylesheet" href="{{ asset('assets/vendor/bootstrap-icons.css') }}">
     <link rel="stylesheet" href="{{ asset('assets/vendor/adminlte.min.css') }}">
-    <link rel="stylesheet" href="{{ asset('assets/adminlte-overrides.css') }}?v=adminlte-fix-20261122">
+    <link rel="stylesheet" href="{{ asset('assets/adminlte-overrides.css') }}?v=da-brand-20261122">
 </head>
 <body class="layout-fixed sidebar-expand-lg bg-body-tertiary" data-bs-theme="light">
 <div class="app-wrapper">
@@ -26,7 +27,7 @@
     <aside class="app-sidebar bg-body-secondary shadow" data-bs-theme="dark">
         <div class="sidebar-brand">
             <a href="{{ route('dashboard') }}" class="brand-link text-decoration-none">
-                <span class="brand-text fw-semibold">PlantCore <span class="fw-normal">Service Desk</span></span>
+                <span class="da-sidebar-brand"><span class="da-sidebar-logo"><img src="https://devalejandre.com/assets/brand/DevAlejandre_logo.svg" alt="DevAlejandre" width="130" height="28"></span><span class="da-sidebar-product">Service Desk</span></span>
             </a>
         </div>
         <div class="sidebar-wrapper">
