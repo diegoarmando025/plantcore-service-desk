@@ -31,4 +31,4 @@ jobs:
           name="PlantCore_Service_Desk_$short.zip"
           gh release create "service-desk-$short" "$name" "$name.sha256" \
             --title "Service Desk · $short" \
-            --notes "Tested CI revision: $REVISION. This ZIP does not include vendor, .env, runtime databases or production storage. Preserve production data and configuration. Deployment on Hostinger must be verified separately."
+            --notes "Tested CI revision: $REVISION. This ZIP does not include vendor, .env, runtime databases or production storage. Preserve production data and configuration. The package is source-controlled and must be validated against the target environment before use."
