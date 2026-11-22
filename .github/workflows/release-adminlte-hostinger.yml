@@ -1,39 +1,34 @@
-name: Package Service Desk AdminLTE for Hostinger
+name: Package verified Service Desk release
 on:
-  push:
-    branches: [main]
-    paths:
-      - "resources/views/**"
-      - "public/assets/**"
-      - "deploy/hostinger-public/**"
+  workflow_run:
+    workflows: ["Laravel MySQL CI"]
+    types: [completed]
 permissions:
   contents: write
 jobs:
   release:
+    if: >-
+      github.event.workflow_run.conclusion == 'success' &&
+      github.event.workflow_run.event == 'push' &&
+      github.event.workflow_run.head_branch == 'main'
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v4
-      - name: Build two-root Hostinger ZIP from exact commit
-        run: |
-          set -euo pipefail
-          mkdir -p package/apps/service-desk package/public_html/service-desk
-          git ls-files -z | while IFS= read -r -d '' file; do
-            case "$file" in
-              .github/*|tests/*|deploy/*|node_modules/*|package.json|package-lock.json|phpunit.xml|.env|.env.*|*.sqlite|*.log) continue ;;
-            esac
-            mkdir -p "package/apps/service-desk/$(dirname "$file")"
-            cp "$file" "package/apps/service-desk/$file"
-          done
-          cp -a deploy/hostinger-public/. package/public_html/service-desk/
-          test -s package/public_html/service-desk/assets/vendor/adminlte.min.css
-          test -s package/apps/service-desk/composer.lock
-          cd package
-          zip -qr "../PlantCore_Service_Desk_AdminLTE_${GITHUB_SHA:0:12}.zip" .
-          cd ..
-          unzip -t "PlantCore_Service_Desk_AdminLTE_${GITHUB_SHA:0:12}.zip" >/dev/null
-      - name: Publish downloadable release
+      - name: Check out tested commit
+        uses: actions/checkout@v4
+        with:
+          ref: ${{ github.event.workflow_run.head_sha }}
+          persist-credentials: false
+      - name: Package tested commit
+        env:
+          REVISION: ${{ github.event.workflow_run.head_sha }}
+        run: bash scripts/package-hostinger.sh "$REVISION"
+      - name: Publish versioned ZIP and SHA-256 checksum
         env:
           GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          REVISION: ${{ github.event.workflow_run.head_sha }}
         run: |
-          short="${GITHUB_SHA:0:12}"
-          gh release create "service-desk-adminlte-$short" "PlantCore_Service_Desk_AdminLTE_$short.zip" --title "Service Desk AdminLTE · $short" --notes "Paquete para Hostinger construido desde commit $GITHUB_SHA. Extraer respetando apps/service-desk y public_html/service-desk. Conservar .env, storage de producción y bases de datos. No contiene vendor; conservar vendor existente. Esta versión solo modifica interfaz; sin migraciones nuevas."
+          short="${REVISION:0:12}"
+          name="PlantCore_Service_Desk_$short.zip"
+          gh release create "service-desk-$short" "$name" "$name.sha256" \
+            --title "Service Desk · $short" \
+            --notes "Tested CI revision: $REVISION. This ZIP does not include vendor, .env, runtime databases or production storage. Preserve production data and configuration. Deployment on Hostinger must be verified separately."
