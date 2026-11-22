@@ -2,6 +2,7 @@
 use App\Http\Controllers\AuthController;
 use App\Http\Controllers\DashboardController;
 use App\Http\Controllers\TicketController;
+use App\Http\Controllers\TicketAttachmentController;
 use App\Http\Controllers\KanbanController;
 use App\Http\Controllers\ReportsController;
 use App\Http\Controllers\AdminController;
@@ -22,6 +23,8 @@ Route::middleware('auth')->group(function(){
  Route::post('/tickets',[TicketController::class,'store'])->middleware('throttle:30,1')->name('tickets.store');
  Route::patch('/tickets/{ticket}/kanban',[KanbanController::class,'move'])->middleware('throttle:60,1')->name('tickets.kanban.move');
  Route::get('/tickets/{ticket}',[TicketController::class,'show'])->name('tickets.show');
+ Route::post('/tickets/{ticket}/attachments',[TicketAttachmentController::class,'store'])->middleware('throttle:12,1')->name('tickets.attachments.store');
+ Route::get('/tickets/{ticket}/attachments/{attachment}',[TicketAttachmentController::class,'download'])->middleware('throttle:60,1')->name('tickets.attachments.download');
  Route::post('/tickets/{ticket}/messages',[TicketController::class,'message'])->middleware('throttle:60,1')->name('tickets.message');
  Route::put('/tickets/{ticket}',[TicketController::class,'update'])->name('tickets.update');
  Route::post('/tickets/{ticket}/transfer',[TicketController::class,'transfer'])->name('tickets.transfer');
