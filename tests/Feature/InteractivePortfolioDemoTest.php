@@ -76,6 +76,7 @@ class InteractivePortfolioDemoTest extends TestCase {
 
     public function test_guest_enters_demo_without_password_and_visits_real_modules(): void {
         extract($this->fixture());
+        $this->get('/login')->assertOk()->assertSee('DevAlejandre_logo.svg')->assertSee('Service Desk')->assertDontSee('PlantCore');
         $this->post('/demo/entrar')->assertRedirect('/guia')->assertSessionHasNoErrors();
         $this->assertAuthenticatedAs($demo);
         $this->get('/guia')->assertOk()->assertSee('Demo interactiva');

@@ -13,7 +13,9 @@ class AdminLteUiTest extends TestCase
             ->assertSee('assets/vendor/adminlte.min.css')
             ->assertSee('assets/vendor/bootstrap.min.css')
             ->assertSee('assets/vendor/bootstrap-icons.css')
-            ->assertSee('Correo corporativo');
+            ->assertSee('Correo electrónico')
+            ->assertSee('DevAlejandre_logo.svg')
+            ->assertSee('Entrar al demo interactivo');
     }
 
     public function test_adminlte_assets_are_committed_for_hostinger(): void
@@ -39,7 +41,7 @@ class AdminLteUiTest extends TestCase
 
         $this->assertStringNotContainsString("asset('assets/app.css')", $layout);
         $this->assertStringContainsString('data-bs-theme="light"', $layout);
-        $this->assertStringContainsString('?v=adminlte-fix-20261122', $layout);
+        $this->assertStringContainsString('?v=da-brand-20261122', $layout);
         $this->assertStringContainsString('small-box text-bg-', $dashboard);
         $this->assertStringContainsString('class="card', $dashboard);
         $this->assertStringContainsString('class="card', $inbox);

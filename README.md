@@ -1,10 +1,10 @@
-# PlantCore Service Desk
+# DevAlejandre Service Desk
 
 A Laravel-based service desk for handling requests across IT, Human Resources, Finance, Purchasing, and Maintenance. The project demonstrates ticket lifecycle management, department-scoped authorization, reporting, and a working interactive demo.
 
 ## Try the application
 
-[Open the interactive demo](https://service-desk.devalejandre.com/login) and select **Entrar como administrador demo**. No sample credentials are required.
+[Open the interactive demo](https://service-desk.devalejandre.com/login) and select **Entrar al demo interactivo**. No sample credentials are required.
 
 The application includes a resettable fictional dataset: 25 service requests and 25 sample agents across five departments. Visitors can create and update requests, post replies and internal notes, assign agents, transfer requests, attach evidence, and inspect operational reports.
 

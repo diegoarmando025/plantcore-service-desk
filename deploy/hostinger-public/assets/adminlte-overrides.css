@@ -73,3 +73,38 @@ body[data-bs-theme="light"]{color-scheme:light}
 @media(max-width:1100px){.app-content .admin-grid{grid-template-columns:repeat(2,minmax(0,1fr))}.app-content .sd-ticket-summary{grid-template-columns:repeat(3,minmax(0,1fr))}}
 @media(max-width:850px){.app-content .twocol{grid-template-columns:1fr}.app-content .sd-ticket-summary{grid-template-columns:repeat(2,minmax(0,1fr))}}
 @media(max-width:580px){.app-content .pageintro{align-items:flex-start;flex-direction:column}.app-content .admin-grid,.app-content .sd-ticket-summary{grid-template-columns:1fr}.app-content .sd-ticket-summary>div{border-right:0;border-bottom:1px solid var(--bs-border-color)}}
+
+
+/* DevAlejandre unified product identity */
+.da-login-page {min-height:100vh;margin:0;color:#203649;color-scheme:light}
+.da-login-shell {display:grid;grid-template-columns:minmax(0,1.03fr) minmax(0,.97fr);min-height:100vh}
+.da-login-story {display:flex;flex-direction:column;justify-content:space-between;gap:3rem;background:#162c3e;color:#fff;padding:clamp(2rem,5.2vw,5rem)}
+.da-story-brand {display:flex;flex-direction:column;align-items:flex-start;gap:.7rem}
+.da-logo-plate {display:inline-flex;align-items:center;justify-content:center;background:#fff;border:1px solid #e2e8ed;border-radius:.45rem;padding:.48rem .7rem;text-decoration:none;max-width:100%}
+.da-logo-plate img {display:block;max-width:100%;width:194px;height:auto}
+.da-product-label {font-size:.85rem;color:#c6d7e3;font-weight:600;letter-spacing:.035em}
+.da-login-eyebrow {font-size:.73rem;font-weight:750;letter-spacing:.14em;color:#60809a;margin-bottom:1rem}
+.da-login-story .da-login-eyebrow {color:#a8cada}
+.da-login-story h1 {font-size:clamp(2.2rem,4.2vw,4.4rem);font-weight:750;letter-spacing:-.05em;line-height:1.08;max-width:15ch;margin:0 0 1.5rem}
+.da-login-story p {color:#d2dee6;line-height:1.7;max-width:50ch;font-size:1.02rem}
+.da-login-features {display:flex;flex-wrap:wrap;gap:.7rem 1.3rem;font-size:.85rem;margin-top:2rem;color:#e5edf2}
+.da-login-features i {color:#7fc8b3}
+.da-login-footer {color:#a9bece;font-size:.82rem}
+.da-login-panel {display:grid;place-items:center;background:#f6f8fa;padding:2rem}
+.da-login-form {background:#fff;width:min(100%,29rem);padding:clamp(1.5rem,3vw,3rem);border:1px solid #e6ebf0;border-radius:1.1rem;box-shadow:0 16px 46px rgba(25,45,63,.055);color:#203649;--bs-body-color:#203649;--bs-secondary-color:#586a7b;--bs-heading-color:#203649}
+.da-login-form h2 {letter-spacing:-.025em;color:#20374b}
+.da-login-form .form-control {min-height:2.7rem;background:#fff!important;color:#203649!important;border-color:#c9d3dd!important}
+.da-login-form .form-control:focus {border-color:#547f9f!important;box-shadow:0 0 0 .2rem rgba(35,75,103,.12)}
+.da-login-form .btn-lg {min-height:3rem;font-size:.98rem;font-weight:700;background:#234b67!important;border-color:#234b67!important;color:#fff!important}
+.da-login-form .btn-lg:hover {background:#18374c!important;border-color:#18374c!important}
+.da-login-form .btn-outline-primary {color:#234b67;border-color:#799cb5}
+.da-login-form .text-secondary {color:#586a7b!important}
+.da-login-divider {display:flex;gap:1rem;align-items:center;margin:1.6rem 0;font-size:.78rem;color:#718090}
+.da-login-divider:before,.da-login-divider:after {content:"";height:1px;background:#dce3ea;flex:1}
+.da-sidebar-brand {display:flex;flex-direction:column;align-items:flex-start;gap:.3rem;padding:.2rem .15rem}
+.da-sidebar-logo {display:inline-flex;align-items:center;background:#fff;padding:.22rem .5rem;border-radius:.3rem}
+.da-sidebar-logo img {display:block;width:130px;height:auto;max-height:30px}
+.da-sidebar-product {font-size:.76rem;color:#d5dfe9;font-weight:600;letter-spacing:.04em}
+a:focus-visible,button:focus-visible,input:focus-visible {outline:3px solid #76a3c4;outline-offset:2px}
+@media(max-width:900px){.da-login-shell{grid-template-columns:1fr}.da-login-story{gap:1.6rem;padding:2rem}.da-login-story h1{font-size:2.2rem;max-width:25ch;margin-bottom:.7rem}.da-login-features{margin-top:1rem}.da-login-panel{padding:1.5rem}}
+@media(max-width:575px){.da-login-story{padding:1.5rem}.da-login-story h1{font-size:1.9rem}.da-login-features{gap:.5rem 1rem}.da-login-panel{padding:1rem}.da-login-form{padding:1.5rem}}
