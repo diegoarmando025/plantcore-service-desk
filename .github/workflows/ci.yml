@@ -32,6 +32,10 @@ jobs:
         run: composer check-platform-reqs
       - name: Check PHP syntax
         run: find app database routes tests -type f -name '*.php' -print0 | xargs -0 -n1 php -l >/dev/null
+      - name: Verify owner provisioning command is registered once
+        run: |
+          php artisan help service-desk:create-admin | grep -F -- '--owner'
+          php artisan help service-desk:create-admin | grep -F -- '--force'
       - name: Validate deployment script syntax
         run: bash -n deploy/deploy-hostinger.sh
       - name: Validate deployment guard without environment file
