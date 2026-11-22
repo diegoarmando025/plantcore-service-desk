@@ -58,6 +58,18 @@ class InteractivePortfolioDemoTest extends TestCase {
             }
         }
         $this->assertSame(25, Ticket::where('is_portfolio_demo', true)->count());
+        foreach (Ticket::where('is_portfolio_demo', true)->where('status', 'resolved')->get() as $resolved) {
+            $this->assertNotNull($resolved->resolved_at);
+            $this->assertTrue($resolved->created_at->lt($resolved->resolved_at));
+            $this->assertTrue($resolved->due_at->gt($resolved->created_at));
+        }
+        foreach (['TI', 'RH', 'FIN', 'COM', 'MTTO'] as $code) {
+            $assigned = Ticket::where('is_portfolio_demo', true)
+                ->where('department_id', $departments[$code]->id)
+                ->whereNotNull('assignee_id')
+                ->distinct()->pluck('assignee_id');
+            $this->assertGreaterThanOrEqual(3, $assigned->count(), $code);
+        }
         $this->assertGreaterThan(0, Ticket::where('is_portfolio_demo', true)->where('due_at', '<', now())->whereNotIn('status', ['resolved','closed'])->count());
         $this->assertGreaterThan(0, \App\Models\TicketMessage::where('internal', true)->count());
     }

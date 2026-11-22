@@ -1,50 +1,71 @@
 # PlantCore Service Desk
 
-Multi-department request and ticket tracking for IT, Human Resources, Finance, Purchasing, and Maintenance. An independently developed portfolio application using fictional scenarios, not a commercial multi-tenant SaaS platform.
+A Laravel-based service desk for handling requests across IT, Human Resources, Finance, Purchasing, and Maintenance. The project demonstrates ticket lifecycle management, department-scoped authorization, reporting, and a working interactive demo.
 
-## Live interactive demo
+## Try the application
 
-**[Open Service Desk](https://service-desk.devalejandre.com/login)** and choose **Entrar como administrador demo**. The real Laravel app allows a visitor to create fictional tickets, assign them to five fictional agents, reply, add internal notes, change priorities and statuses, transfer tickets between departments, and see history and dashboard indicators.
+[Open the interactive demo](https://service-desk.devalejandre.com/login) and select **Entrar como administrador demo**. No sample credentials are required.
 
-All visitors share fictional data in MySQL. An operator-only command can reset demo tickets. Visitor access cannot change user administration or real tickets. This is not a separate app, per-visitor sandbox, or commercial multi-tenant SaaS.
+The application includes a resettable fictional dataset: 25 service requests and 25 sample agents across five departments. Visitors can create and update requests, post replies and internal notes, assign agents, transfer requests, attach evidence, and inspect operational reports.
 
-[Interactive reviewer guide](docs/INTERACTIVE_PORTFOLIO_DEMO.md) · [Traceability with REST API](https://traceability.devalejandre.com/login) · [LPA audits](https://lpa.devalejandre.com/login).
+Demo visitors share the same sample account and data. Do not enter confidential or personal information. Demo data is isolated from operational records, but individual visitors do not receive separate workspaces.
 
-## Current stack
+## Technology
 
-- PHP 8.3+ (Hostinger web runtime must be checked separately from SSH)
-- Laravel 12 (locked at 12.73.0 in the current release)
-- MySQL 8 for CI and the **intended** Service Desk production configuration
+- PHP 8.3 and Laravel 12
+- MySQL 8
 - Blade, AdminLTE 4, Bootstrap 5, Bootstrap Icons
-- PHPUnit feature tests and GitHub Actions
+- PHPUnit feature tests
+- GitHub Actions for automated testing and release verification
 
-**Hostinger operator verification (2026-11-22):** Laravel CLI reported MySQL as the default driver, six fictional demo users, seven demo tickets, debug off, and the operator confirmed the site loads. Reverify the web runtime and smoke tests after every deployment.
+## Features
 
-## Implemented
+- Requester and agent authentication with a password-free sample entry point
+- Ticket creation, assignment, priority management, status changes, and history
+- Department and team membership controls
+- Department transfers with restricted visibility of previous internal notes
+- Private file attachments with validated types, file-size limits, and authorized downloads
+- Dashboard, Kanban board, department and agent workload reporting
+- Elapsed-time SLA measurement and CSV exports
+- Administration of users, departments, teams, and service categories
+- Protected owner account and separate access rules for the shared demo dataset
+- Guarded commands to provision and restore fictional sample records
 
-- Requester and agent authentication
-- Tickets with unique codes, priorities, statuses, assignments, comments, internal notes, and activity history
-- Department, team, category, and user administration
-- Ticket transfer between departments with original department internal notes hidden from the new team
-- Role-based and department-scoped access checks
-- Locally bundled AdminLTE frontend assets
+The application is an implementation of a single-organization service desk, not a multi-tenant SaaS product. It does not implement email notifications, subscription billing, or business-hour SLA schedules.
 
-Not yet implemented: attachments, subtickets, approval workflows, outbound notifications, business-hour SLAs, subscription billing, or multi-tenancy.
+## Architecture
 
-## Local setup (dedicated test data only)
+The application follows Laravel's MVC conventions:
 
-1. Run `composer install` using PHP 8.3 or later and verify `composer check-platform-reqs`.
-2. Copy `.env.example` to an untracked `.env` and configure a separate MySQL database.
-3. Generate the application key once with `php artisan key:generate`.
-4. Run `php artisan migrate` after verifying the database, then `php artisan service-desk:install-catalog`.
-5. Run `php artisan test`. Do not run any destructive database operation against production.
+- **Controllers** handle HTTP input, validation, and workflow actions.
+- **Eloquent models and relationships** represent users, service requests, departments, teams, messages, activities, and attachments.
+- **Access rules** restrict ticket visibility and modification by role, department membership, and demo data classification.
+- **Database transactions** protect multi-step updates such as ticket transfers and demo restoration.
+- **Blade templates** render server-side interfaces using AdminLTE and Bootstrap.
+- **Feature tests** exercise authentication, permissions, ticket workflows, attachments, reports, and demo isolation.
 
-The GitHub Actions CI uses a disposable MySQL 8 service to exercise the feature tests.
+[Architecture and evaluation notes](docs/INTERACTIVE_PORTFOLIO_DEMO.md)
 
-## Hostinger deployment
+## Local development
 
-The application lives outside the web document root in `apps/service-desk`; the public front controller and assets live in the configured subdomain document root. Inspect the actual document root before extraction.
+Use a dedicated development database and never copy production credentials into the repository.
 
-See [deployment instructions](deploy/PUBLICACION.md) and [guarded deployment script](deploy/deploy-hostinger.sh). The script defaults to PHP 8.3 and refuses to change the database until a specific expected MySQL database is confirmed. It never writes `.env`.
+```bash
+composer install
+cp .env.example .env
+php artisan key:generate
+php artisan migrate
+php artisan service-desk:install-catalog
+php artisan test
+```
 
-Do not upload `.env`, production logs, private files, or database files to GitHub. A passing GitHub workflow is not proof of a successful deployment on Hostinger.
+Configure the database connection in the local `.env` before running migrations. The automated test workflow uses a disposable MySQL service.
+
+## Related projects
+
+- [Industrial Traceability](https://github.com/diegoarmando025/industrial-traceability-api)
+- [Layered Process Audits](https://github.com/diegoarmando025/plantcore-lpa)
+
+## Project scope
+
+This repository contains an independently developed portfolio application and fictional test scenarios. It is intended to demonstrate working engineering decisions and implementation rather than represent a deployed commercial customer system.
