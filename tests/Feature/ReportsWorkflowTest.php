@@ -83,7 +83,7 @@ class ReportsWorkflowTest extends TestCase
         $response = $this->actingAs($demo)->get('/reports/export');
         $response->assertOk()->assertHeader('content-type','text/csv; charset=UTF-8');
         $content = $response->streamedContent();
-        $this->assertStringContainsString('SLA cumplidos,1', $content);
+        $this->assertStringContainsString('"SLA cumplidos",1', $content);
         $this->assertStringNotContainsString('Privado que no debe filtrarse', $content);
         $this->assertStringNotContainsString('Solicitante privado', $content);
     }
