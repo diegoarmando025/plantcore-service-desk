@@ -32,6 +32,27 @@ jobs:
         run: composer check-platform-reqs
       - name: Check PHP syntax
         run: find app database routes tests -type f -name '*.php' -print0 | xargs -0 -n1 php -l >/dev/null
+      - name: Validate deployment script syntax
+        run: bash -n deploy/deploy-hostinger.sh
+      - name: Validate deployment guard without environment file
+        run: |
+          if bash deploy/deploy-hostinger.sh; then
+            echo 'Expected preflight to refuse missing private configuration'
+            exit 1
+          fi
+      - name: Check production MySQL preflight without writing data
+        env:
+          APP_ENV: production
+          APP_KEY: base64:AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA=
+          DB_CONNECTION: mysql
+          DB_DATABASE: plantcore_service_desk_test
+          DB_HOST: 127.0.0.1
+          DB_PORT: '3306'
+          DB_USERNAME: root
+          DB_PASSWORD: root
+        run: |
+          cp .env.example .env
+          PHP_BIN="$(command -v php)" EXPECTED_DB_DATABASE=plantcore_service_desk_test bash deploy/deploy-hostinger.sh
       - name: Run feature tests on MySQL
         env:
           APP_ENV: testing
