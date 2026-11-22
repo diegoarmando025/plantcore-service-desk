@@ -3,6 +3,7 @@
 @section('content')
 <div class="d-flex flex-wrap justify-content-between align-items-center gap-3 mb-3">
  <div><h2 class="h4 fw-semibold text-body mb-1">Bandeja de tickets</h2><p class="text-secondary mb-0">Busca, filtra y atiende las solicitudes de tu área.</p></div>
+ <a class="btn btn-outline-primary" href="{{ route('tickets.kanban') }}"><i class="bi bi-kanban me-1"></i>Ver Kanban</a>
  <a class="btn btn-primary" href="{{ route('tickets.create') }}"><i class="bi bi-plus-lg me-1"></i>Nuevo ticket</a>
 </div>
 <div class="d-flex flex-wrap gap-2 mb-3">
