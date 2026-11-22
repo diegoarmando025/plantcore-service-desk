@@ -20,8 +20,8 @@
  <form method="GET" action="{{ route('tickets.index') }}" class="row g-3 align-items-end">
   <div class="col-12 col-md-4"><label class="form-label" for="q">Folio o asunto</label><input class="form-control" id="q" name="q" maxlength="100" value="{{ $filters['q']??'' }}" placeholder="Buscar solicitud"></div>
   <div class="col-12 col-md-3"><label class="form-label" for="department_id">Departamento</label><select class="form-select" id="department_id" name="department_id"><option value="">Todos</option>@foreach($departments as $d)<option value="{{ $d->id }}" @selected(($filters['department_id']??'')==$d->id)>{{ $d->name }}</option>@endforeach</select></div>
-  <div class="col-6 col-md-2"><label class="form-label" for="status">Estado</label><select class="form-select" id="status" name="status"><option value="">Todos</option>@foreach(\App\Models\Ticket::STATUSES as $status)<option value="{{ $status }}" @selected(($filters['status']??'')===$status)>{{ ucfirst(str_replace('_',' ',$status)) }}</option>@endforeach</select></div>
-  <div class="col-6 col-md-2"><label class="form-label" for="priority">Prioridad</label><select class="form-select" id="priority" name="priority"><option value="">Todas</option>@foreach(\App\Models\Ticket::PRIORITIES as $priority)<option value="{{ $priority }}" @selected(($filters['priority']??'')===$priority)>{{ ucfirst($priority) }}</option>@endforeach</select></div>
+  <div class="col-6 col-md-2"><label class="form-label" for="status">Estado</label><select class="form-select" id="status" name="status"><option value="">Todos</option>@foreach(\App\Models\Ticket::STATUSES as $status)<option value="{{ $status }}" @selected(($filters['status']??'')===$status)>{{ \App\Models\Ticket::STATUS_LABELS[$status] }}</option>@endforeach</select></div>
+  <div class="col-6 col-md-2"><label class="form-label" for="priority">Prioridad</label><select class="form-select" id="priority" name="priority"><option value="">Todas</option>@foreach(\App\Models\Ticket::PRIORITIES as $priority)<option value="{{ $priority }}" @selected(($filters['priority']??'')===$priority)>{{ \App\Models\Ticket::PRIORITY_LABELS[$priority] }}</option>@endforeach</select></div>
   <div class="col-12 col-md-1 d-flex gap-2"><button type="submit" class="btn btn-primary" title="Filtrar"><i class="bi bi-funnel"></i><span class="visually-hidden">Aplicar filtros</span></button><a href="{{ route('tickets.index') }}" class="btn btn-outline-secondary" title="Limpiar"><i class="bi bi-x-lg"></i><span class="visually-hidden">Limpiar</span></a></div>
  </form>
  </div>
@@ -35,8 +35,8 @@
     <tr>
      <td><a class="fw-bold text-decoration-none" href="{{ route('tickets.show',$t) }}">{{ $t->code }}</a><div class="small text-secondary">{{ $t->title }}</div></td>
      <td>{{ $t->department?->name ?? '—' }}</td><td>{{ $t->requester?->name ?? '—' }}</td><td>{{ $t->assignee?->name ?? 'Sin asignar' }}</td>
-     <td><span class="badge {{ $t->priority==='critical'?'text-bg-danger':($t->priority==='high'?'text-bg-warning':'text-bg-secondary') }}">{{ ucfirst($t->priority) }}</span></td>
-     <td><span class="badge text-bg-light border">{{ ucfirst(str_replace('_',' ',$t->status)) }}</span></td>
+     <td><span class="badge {{ $t->priorityBadgeClass() }}">{{ $t->priorityLabel() }}</span></td>
+     <td><span class="badge {{ $t->statusBadgeClass() }}">{{ $t->statusLabel() }}</span></td>
      <td><a class="btn btn-sm btn-outline-primary" href="{{ route('tickets.show',$t) }}">Abrir</a></td>
     </tr>
    @empty<tr><td colspan="7" class="text-center text-secondary py-5"><i class="bi bi-inbox fs-3 d-block mb-2"></i>No hay solicitudes para los filtros seleccionados.</td></tr>@endforelse</tbody>
