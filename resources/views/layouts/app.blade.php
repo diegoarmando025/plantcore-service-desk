@@ -34,6 +34,7 @@
             <nav class="mt-3">
                 <ul class="nav sidebar-menu flex-column" data-lte-toggle="treeview" role="navigation" aria-label="Navegación principal">
                     <li class="nav-header">OPERACIÓN</li>
+                    <li class="nav-item"><a href="{{ route('portfolio.guide') }}" class="nav-link {{ request()->routeIs('portfolio.guide') ? 'active' : '' }}"><i class="nav-icon bi bi-map"></i><p>Guía del sistema</p></a></li>
                     <li class="nav-item"><a href="{{ route('dashboard') }}" class="nav-link {{ request()->routeIs('dashboard') ? 'active' : '' }}"><i class="nav-icon bi bi-grid-1x2"></i><p>Panel general</p></a></li>
                     <li class="nav-item"><a href="{{ route('tickets.index') }}" class="nav-link {{ request()->routeIs('tickets.index', 'tickets.show') ? 'active' : '' }}"><i class="nav-icon bi bi-inboxes"></i><p>Solicitudes</p></a></li>
                     <li class="nav-item"><a href="{{ route('tickets.create') }}" class="nav-link {{ request()->routeIs('tickets.create') ? 'active' : '' }}"><i class="nav-icon bi bi-plus-circle"></i><p>Nueva solicitud</p></a></li>
@@ -50,6 +51,9 @@
             <h1 class="h4 mb-0">@yield('heading', 'Panel general')</h1>
         </div></div>
         <div class="app-content"><div class="container-fluid service-desk-content">
+            @if(auth()->user()->is_portfolio_demo)
+              <div class="alert alert-info py-2">Modo evaluación: datos ficticios compartidos entre visitantes. Evita información personal o confidencial. <a href="{{ route('portfolio.guide') }}">Ver recorrido</a></div>
+            @endif
             @if(session('ok'))<div class="alert alert-success">{{ session('ok') }}</div>@endif
             @if($errors->any())<div class="alert alert-danger"><strong>Revisa los datos:</strong><ul class="mb-0">@foreach($errors->all() as $e)<li>{{ $e }}</li>@endforeach</ul></div>@endif
             @yield('content')
