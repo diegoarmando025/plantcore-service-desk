@@ -35,7 +35,7 @@
    <tbody>@forelse($tickets as $t)
     <tr>
      <td><a class="fw-bold text-decoration-none" href="{{ route('tickets.show',$t) }}">{{ $t->code }}</a><div class="small text-secondary">{{ $t->title }}</div></td>
-     <td>{{ $t->department?->name ?? '—' }}</td><td>{{ $t->requester?->name ?? '—' }}</td><td>{{ $t->assignee?->name ?? 'Sin asignar' }}</td>
+     <td>{{ $t->department?->name ?? '—' }}</td><td>{{ $t->requester?->email === 'portfolio.demo@service-desk.example.invalid' ? 'Evaluador demo' : ($t->requester?->name ?? '—') }}</td><td>{{ $t->assignee?->email === 'portfolio.demo@service-desk.example.invalid' ? 'Evaluador demo' : ($t->assignee?->name ?? 'Sin asignar') }}</td>
      <td><span class="badge {{ $t->priorityBadgeClass() }}">{{ $t->priorityLabel() }}</span></td>
      <td><span class="badge {{ $t->statusBadgeClass() }}">{{ $t->statusLabel() }}</span></td>
      <td><a class="btn btn-sm btn-outline-primary" href="{{ route('tickets.show',$t) }}">Abrir</a></td>
