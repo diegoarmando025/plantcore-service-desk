@@ -32,7 +32,14 @@
                 </div>
                 <button type="submit" class="btn btn-primary w-100">Ingresar</button>
             </form>
-            <p class="text-secondary small text-center mt-4 mb-0">Acceso para usuarios autorizados.</p>
+            <div class="border-top mt-4 pt-3">
+                <p class="text-secondary small text-center">¿Quieres evaluar el sistema?</p>
+                <form method="POST" action="{{ route('portfolio.enter') }}">
+                    @csrf
+                    <button type="submit" class="btn btn-outline-primary w-100">Entrar como administrador demo</button>
+                </form>
+                <p class="text-secondary small text-center mt-2 mb-0">Acceso a tickets ficticios sin contraseña. No introduzcas datos reales.</p>
+            </div>
         </div>
     </div>
 </div>

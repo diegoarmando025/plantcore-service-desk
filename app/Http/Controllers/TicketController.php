@@ -17,6 +17,8 @@ class TicketController extends Controller {
   $user=$request->user();$deps=$user->departments()->pluck('departments.id');
   $filters=$request->validate(['status'=>['nullable',Rule::in(Ticket::STATUSES)],'priority'=>['nullable',Rule::in(Ticket::PRIORITIES)],'department_id'=>['nullable','integer'],'q'=>['nullable','string','max:100'],'mine'=>['nullable',Rule::in(['1'])]]);
   $query=Ticket::query()->with(['department:id,name','requester:id,name','assignee:id,name']);
+  if ($user->is_portfolio_demo) $query->where('is_portfolio_demo',true);
+  elseif (! $user->is_owner) $query->where('is_portfolio_demo',false);
   if(!$user->isAdmin())$query->where(function($q)use($user,$deps){$q->where('requester_id',$user->id);if($user->role==='agent')$q->orWhereIn('department_id',$deps);});
   if(!empty($filters['mine']))$query->where('requester_id',$user->id);
   if(!empty($filters['status']))$query->where('status',$filters['status']);
@@ -38,7 +40,7 @@ class TicketController extends Controller {
   abort_unless(Department::whereKey($data['department_id'])->where('active',true)->exists(),422);
   // Initial SLA is elapsed hours, not business hours. This is explicitly labeled in UI.
   $ticket=DB::transaction(function()use($request,$data,$category){
-   $t=Ticket::create(['title'=>$data['title'],'description'=>$data['description'],'requester_id'=>$request->user()->id,'department_id'=>$data['department_id'],'team_id'=>$category->team_id,'ticket_category_id'=>$category->id,'priority'=>$data['priority'],'status'=>'open','due_at'=>now()->addHours($category->sla_hours)]);
+   $t=Ticket::create(['title'=>$data['title'],'description'=>$data['description'],'requester_id'=>$request->user()->id,'department_id'=>$data['department_id'],'team_id'=>$category->team_id,'ticket_category_id'=>$category->id,'priority'=>$data['priority'],'status'=>'open','is_portfolio_demo'=>(bool)$request->user()->is_portfolio_demo,'due_at'=>now()->addHours($category->sla_hours)]);
    $t->update(['code'=>'SD-'.str_pad((string)$t->id,6,'0',STR_PAD_LEFT)]);
    $t->activities()->create(['user_id'=>$request->user()->id,'action'=>'created','details'=>['department_id'=>$t->department_id,'category_id'=>$category->id]]);
    return $t;
@@ -56,6 +58,7 @@ class TicketController extends Controller {
     }), 'messages.user:id,name',
     'activities.user:id,name']);
   $users=$isAgent?User::query()->where('active',true)->whereIn('id',DB::table('department_user')->where('department_id',$ticket->department_id)->pluck('user_id'))->orderBy('name')->get(['id','name']):collect();
+  if($isAgent && $request->user()->is_portfolio_demo)$users=User::whereKey($request->user()->id)->get(['id','name']);
   if($isAgent && $request->user()->isAdmin())$users=User::where('active',true)->whereIn('role',['agent','admin'])->orderBy('name')->get(['id','name']);
   $teams=$isAgent?Team::where('department_id',$ticket->department_id)->where('active',true)->orderBy('name')->get(['id','name']):collect();
   $departments=$isAgent?Department::where('active',true)->orderBy('name')->get(['id','name']):collect();
@@ -85,6 +88,8 @@ class TicketController extends Controller {
    if($assigneeId!==null){
     $assignee=User::whereKey($assigneeId)->where('active',true)->firstOrFail();
     abort_unless($assignee->isAgent() && ($assignee->isAdmin() || $assignee->departments()->whereKey($locked->department_id)->exists()),422,'Responsable fuera del departamento.');
+    if ($request->user()->is_portfolio_demo) abort_unless($assignee->id === $request->user()->id && $assignee->is_portfolio_demo,422,'Solo el usuario ficticio puede recibir tickets de evaluación.');
+    if (! $request->user()->is_portfolio_demo) abort_unless(! $assignee->is_portfolio_demo,422,'No se puede asignar un ticket operativo a una cuenta demo.');
     if($teamId!==null && !$assignee->isAdmin())abort_unless($assignee->departments()->whereKey($locked->department_id)->exists() && DB::table('team_user')->where('team_id',$teamId)->where('user_id',$assigneeId)->exists(),422,'El responsable no pertenece al equipo.');
    }
    $old=$locked->only(['status','priority','team_id','assignee_id']);
