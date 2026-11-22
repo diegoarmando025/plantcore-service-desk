@@ -88,6 +88,7 @@ final class PortfolioDemoScenario {
             }
         }
 
+        $assignmentOffsets = array_fill_keys(array_keys($agents), 0);
         foreach ($examples as $ticketIndex => [$departmentCode, $categoryCode, $title, $body, $priority, $status]) {
             $department = Department::where('code', $departmentCode)->first();
             $category = $department ? TicketCategory::where('department_id', $department->id)
@@ -96,14 +97,27 @@ final class PortfolioDemoScenario {
             $exists = Ticket::where('is_portfolio_demo', true)->where('requester_id', $demo->id)
                 ->where('title', $title)->exists();
             if ($exists) continue;
+            $assignedAgent = $agents[$departmentCode][$assignmentOffsets[$departmentCode] % 5];
+            $assignmentOffsets[$departmentCode]++;
+            // Use elapsed time and the catalog SLA to keep example reporting internally consistent.
+            $openedAt = now()->subHours(12 + $ticketIndex * 3);
+            $deadline = $openedAt->copy()->addHours($category->sla_hours);
+            $resolvedAt = $status === 'resolved'
+                ? $openedAt->copy()->addHours(min(6 + ($ticketIndex % 5), max(1, $category->sla_hours + 2)))
+                : null;
             $ticket = Ticket::create([
                 'title' => $title, 'description' => $body, 'requester_id' => $demo->id,
                 'department_id' => $department->id, 'team_id' => $category->team_id,
-                'ticket_category_id' => $category->id, 'assignee_id' => $status === 'open' ? null : $agents[$departmentCode][$ticketIndex % 5]->id,
-                'priority' => $priority, 'status' => $status, 'due_at' => $status === 'open' && $ticketIndex % 2 === 1 ? now()->subHours(4) : now()->addHours($category->sla_hours),
-                'resolved_at' => $status === 'resolved' ? now() : null, 'is_portfolio_demo' => true,
+                'ticket_category_id' => $category->id,
+                'assignee_id' => $status === 'open' ? null : $assignedAgent->id,
+                'priority' => $priority, 'status' => $status, 'due_at' => $deadline,
+                'resolved_at' => $resolvedAt, 'is_portfolio_demo' => true,
             ]);
-            $ticket->update(['code' => 'SD-'.str_pad((string)$ticket->id, 6, '0', STR_PAD_LEFT)]);
+            $ticket->forceFill([
+                'code' => 'SD-'.str_pad((string)$ticket->id, 6, '0', STR_PAD_LEFT),
+                'created_at' => $openedAt,
+                'updated_at' => $resolvedAt ?? $openedAt->copy()->addHours(1),
+            ])->save();
             $ticket->activities()->create([
                 'user_id' => $demo->id, 'action' => 'created',
                 'details' => ['demo' => true, 'department_id' => $department->id],
@@ -114,12 +128,12 @@ final class PortfolioDemoScenario {
             ]);
             if ($status !== 'open') {
                 $ticket->messages()->create([
-                    'user_id' => $agents[$departmentCode][$ticketIndex % 5]->id,
+                    'user_id' => $assignedAgent->id,
                     'body' => 'Solicitud recibida. Se inició la revisión correspondiente.',
                     'department_id' => $department->id, 'internal' => false,
                 ]);
                 $ticket->messages()->create([
-                    'user_id' => $agents[$departmentCode][$ticketIndex % 5]->id,
+                    'user_id' => $assignedAgent->id,
                     'body' => 'Verificar el procedimiento y documentar el resultado antes del cierre.',
                     'department_id' => $department->id, 'internal' => true,
                 ]);
