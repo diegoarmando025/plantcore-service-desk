@@ -44,6 +44,24 @@ class InteractivePortfolioDemoTest extends TestCase {
         return compact('owner','demo','departments');
     }
 
+    public function test_demo_has_five_isolated_agents_per_department_and_realistic_workload(): void {
+        extract($this->fixture());
+        foreach (['TI', 'RH', 'FIN', 'COM', 'MTTO'] as $code) {
+            $agents = User::where('is_portfolio_demo', true)
+                ->where('role', 'agent')
+                ->where('email', 'like', 'portfolio.'.strtolower($code).'%@service-desk.example.invalid')
+                ->get();
+            $this->assertCount(5, $agents, $code);
+            foreach ($agents as $agent) {
+                $this->assertFalse($agent->is_owner);
+                $this->assertTrue($agent->departments()->whereKey($departments[$code]->id)->exists());
+            }
+        }
+        $this->assertSame(25, Ticket::where('is_portfolio_demo', true)->count());
+        $this->assertGreaterThan(0, Ticket::where('is_portfolio_demo', true)->where('due_at', '<', now())->whereNotIn('status', ['resolved','closed'])->count());
+        $this->assertGreaterThan(0, \App\Models\TicketMessage::where('internal', true)->count());
+    }
+
     public function test_guest_enters_demo_without_password_and_visits_real_modules(): void {
         extract($this->fixture());
         $this->post('/demo/entrar')->assertRedirect('/guia')->assertSessionHasNoErrors();
@@ -53,7 +71,7 @@ class InteractivePortfolioDemoTest extends TestCase {
         $this->get('/tickets')->assertOk();
         $this->get('/tickets/create')->assertOk();
         $this->get('/admin')->assertForbidden();
-        $this->assertSame(7,Ticket::where('is_portfolio_demo',true)->count());
+        $this->assertSame(25,Ticket::where('is_portfolio_demo',true)->count());
     }
 
     public function test_demo_can_create_update_reply_and_transfer_only_fictional_tickets(): void {
@@ -157,10 +175,10 @@ class InteractivePortfolioDemoTest extends TestCase {
             'ticket_category_id'=>$category->id,'is_portfolio_demo'=>true,
         ]);
         $deleted=PortfolioDemoScenario::reset($demo);
-        $this->assertSame(8,$deleted);
+        $this->assertSame(26,$deleted);
         $this->assertDatabaseHas('tickets',['id'=>$real->id,'is_portfolio_demo'=>false]);
         $this->assertDatabaseMissing('tickets',['id'=>$extra->id]);
-        $this->assertSame(7,Ticket::where('is_portfolio_demo',true)->count());
+        $this->assertSame(25,Ticket::where('is_portfolio_demo',true)->count());
     }
 
     public function test_guest_access_refuses_unprovisioned_or_unsafe_account(): void {
