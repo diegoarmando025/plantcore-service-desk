@@ -64,7 +64,7 @@
     <table class="table table-hover align-middle mb-0"><thead><tr><th>Solicitud</th><th>Prioridad</th><th>Plazo</th></tr></thead>
     <tbody>@forelse($urgent as $ticket)
      <tr><td><a class="fw-semibold" href="{{ route('tickets.show',$ticket) }}">{{ $ticket->code }}</a><div class="small text-secondary">{{ $ticket->title }}</div></td>
-      <td><span class="badge {{ $ticket->priority==='critical'?'text-bg-danger':($ticket->priority==='high'?'text-bg-warning':'text-bg-secondary') }}">{{ ucfirst($ticket->priority) }}</span></td>
+      <td><span class="badge {{ $ticket->priorityBadgeClass() }}">{{ $ticket->priorityLabel() }}</span></td>
       <td class="{{ $ticket->due_at->isPast() ? 'text-danger fw-semibold' : 'text-body-secondary' }} small">{{ $ticket->due_at->format('d/m/Y H:i') }}</td>
      </tr>
     @empty<tr><td colspan="3" class="text-center text-secondary py-4">No hay solicitudes pendientes de vencer.</td></tr>@endforelse</tbody></table>
@@ -78,7 +78,7 @@
     <div class="list-group list-group-flush">
     @forelse($recent as $ticket)
      <a class="list-group-item list-group-item-action d-flex justify-content-between align-items-center gap-2" href="{{ route('tickets.show',$ticket) }}">
-      <div class="overflow-hidden"><strong class="small">{{ $ticket->code }}</strong><div class="text-truncate">{{ $ticket->title }}</div><small class="text-secondary">{{ $ticket->department?->name }}</small></div><span class="badge text-bg-secondary">{{ ucfirst(str_replace('_',' ',$ticket->status)) }}</span>
+      <div class="overflow-hidden"><strong class="small">{{ $ticket->code }}</strong><div class="text-truncate">{{ $ticket->title }}</div><small class="text-secondary">{{ $ticket->department?->name }}</small></div><span class="badge {{ $ticket->statusBadgeClass() }}">{{ $ticket->statusLabel() }}</span>
      </a>
     @empty<div class="p-4 text-center text-secondary">No hay solicitudes recientes.</div>@endforelse
     </div>

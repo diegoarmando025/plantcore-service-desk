@@ -67,7 +67,7 @@ class OperationsDashboardTest extends TestCase
         extract($this->setupDemo());
         $response = $this->actingAs($demo)->get('/dashboard');
         $response->assertOk()
-            ->assertSee('Centro de operación')
+            ->assertSee('Resumen de solicitudes')
             ->assertSee('Fuera de plazo')
             ->assertSee('Carga por agente')
             ->assertSee('Demo para comprobar SLA')

@@ -19,7 +19,7 @@
  <div class="list-group list-group-flush">
  @forelse($recent as $ticket)
   <a class="list-group-item list-group-item-action" href="{{ route('tickets.show', $ticket) }}">
-   <strong>{{ $ticket->code }}</strong> — {{ $ticket->title }} <span class="text-secondary">({{ $ticket->status }})</span>
+   <strong>{{ $ticket->code }}</strong> — {{ $ticket->title }} <span class="text-secondary">({{ $ticket->statusLabel() }})</span>
   </a>
  @empty
   <p>No hay tickets de ejemplo. Puedes crear el primero.</p>

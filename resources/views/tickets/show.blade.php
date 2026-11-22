@@ -1,21 +1,119 @@
 @extends('layouts.app')
-@section('heading', $ticket->code)
-@section('content')<div class="pageintro"><div><div class="eyebrow">{{ $ticket->department->name }} / {{ $ticket->category->name }}</div><h2>{{ $ticket->title }}</h2><p class="muted">Registrado por {{ $ticket->requester->name }} · {{ $ticket->created_at->format('d/m/Y H:i') }}</p></div><a class="btn btn-secondary" href="{{ route('tickets.index') }}">← Bandeja</a></div>
-<div class="sd-ticket-summary mb-3"><div><span>Folio</span><strong>{{ $ticket->code }}</strong></div><div><span>Estado actual</span><strong>{{ ucfirst(str_replace('_',' ',$ticket->status)) }}</strong></div><div><span>Prioridad</span><strong>{{ ucfirst($ticket->priority) }}</strong></div><div><span>Responsable</span><strong>{{ $ticket->assignee?->name ?? 'Sin asignar' }}</strong></div><div><span>Plazo de atención</span><strong class="{{ $ticket->due_at && $ticket->due_at->isPast() && !in_array($ticket->status,['resolved','closed']) ? 'sd-overdue' : '' }}">{{ $ticket->due_at?->format('d/m/Y H:i') ?? 'No definido' }}</strong></div></div><div class="twocol ticketcols"><div><section class="panel pad mb sd-ticket-panel"><div class="ticketmeta"><span class="pill {{ $ticket->priority }}">{{ ucfirst($ticket->priority) }}</span><span class="pill status">{{ ucfirst(str_replace('_',' ',$ticket->status)) }}</span>@if($ticket->due_at)<span class="muted">Plazo: {{ $ticket->due_at->format('d/m/Y H:i') }}</span>@endif</div><h3>Descripción</h3><p class="multiline">{{ $ticket->description }}</p></section>
-<section class="panel pad sd-ticket-panel"><h3><i class="bi bi-chat-square-text me-2"></i>Conversación</h3>@forelse($ticket->messages as $m)<div class="message {{ $m->internal?'internal':'' }}"><div class="messagehead"><strong>{{ $m->user->name }}</strong><span>{{ $m->created_at->format('d/m/Y H:i') }}</span>@if($m->internal)<span class="pill">Nota interna</span>@endif</div><p class="multiline">{{ $m->body }}</p></div>@empty<p class="muted">Sin respuestas todavía.</p>@endforelse
-@if($ticket->status!=='closed')<form method="POST" action="{{ route('tickets.message',$ticket) }}">@csrf<label>Responder<textarea name="body" rows="4" required minlength="2" maxlength="10000" placeholder="Escribe una actualización..."></textarea></label>@if($isAgent)<label class="check"><input type="checkbox" name="internal" value="1"> Nota interna (oculta al solicitante)</label>@endif<button class="btn btn-primary">Publicar respuesta</button></form>@endif</section></div>
-<aside><section class="panel pad mb"><h3><i class="bi bi-person-check me-2"></i>Asignación</h3><div class="fieldvalue"><span>Equipo</span><strong>{{ $ticket->team?->name ?? 'Sin equipo' }}</strong></div><div class="fieldvalue"><span>Responsable</span><strong>{{ $ticket->assignee?->name ?? 'Sin asignar' }}</strong></div><div class="fieldvalue"><span>Estado</span><strong>{{ ucfirst(str_replace('_',' ',$ticket->status)) }}</strong></div>
-@if($isAgent && $ticket->status!=='closed')<form method="POST" action="{{ route('tickets.update',$ticket) }}">@csrf @method('PUT')<label>Estado<select name="status">@foreach(\App\Models\Ticket::STATUSES as $s)<option value="{{ $s }}" @selected($ticket->status===$s)>{{ ucfirst(str_replace('_',' ',$s)) }}</option>@endforeach</select></label><label>Prioridad<select name="priority">@foreach(\App\Models\Ticket::PRIORITIES as $s)<option value="{{ $s }}" @selected($ticket->priority===$s)>{{ ucfirst($s) }}</option>@endforeach</select></label><label>Equipo<select name="team_id"><option value="">Sin equipo</option>@foreach($teams as $team)<option value="{{ $team->id }}" @selected($ticket->team_id===$team->id)>{{ $team->name }}</option>@endforeach</select></label><label>Asignar a<select name="assignee_id"><option value="">Sin asignar</option>@foreach($users as $user)<option value="{{ $user->id }}" @selected($ticket->assignee_id===$user->id)>{{ $user->name }}</option>@endforeach</select></label><button class="btn btn-primary full">Guardar cambios</button></form>@endif</section>
+@section('title', $ticket->code)
+@section('content')
+<div class="d-flex flex-wrap justify-content-between align-items-start gap-3 mb-3">
+ <div>
+  <div class="small text-secondary mb-1">{{ $ticket->department->name }} / {{ $ticket->category->name }}</div>
+  <h1 class="h4 fw-bold mb-1 text-body">{{ $ticket->title }}</h1>
+  <div class="small text-secondary">Folio {{ $ticket->code }} · Registrado por {{ $ticket->requester->name }} el {{ $ticket->created_at->format('d/m/Y H:i') }}</div>
+ </div>
+ <a class="btn btn-outline-secondary" href="{{ route('tickets.index') }}"><i class="bi bi-arrow-left me-1"></i>Volver a solicitudes</a>
+</div>
 
-@if($isAgent && $ticket->status!=='closed')
-<section class="panel pad mt"><h3>Transferir a otro departamento</h3><p class="muted">Conserva el folio, las respuestas públicas y el historial. Las notas internas del área anterior permanecen privadas. La nueva área recibirá el ticket sin responsable asignado.</p>
-<form method="POST" action="{{ route('tickets.transfer',$ticket) }}">@csrf
-<label>Departamento destino<select id="transfer_department" name="department_id" required><option value="">Seleccionar</option>@foreach($departments as $d)<option value="{{ $d->id }}">{{ $d->name }}</option>@endforeach</select></label>
-<label>Servicio destino<select id="transfer_category" name="ticket_category_id" required><option value="">Selecciona el departamento</option>@foreach($categories as $c)<option data-department="{{ $c->department_id }}" value="{{ $c->id }}">{{ $c->name }}</option>@endforeach</select></label>
-<label>Motivo de transferencia<textarea name="reason" rows="3" minlength="10" maxlength="1000" required placeholder="Describe qué debe atender la nueva área..."></textarea></label>
-<button class="btn btn-secondary">Transferir solicitud</button>
-</form></section>
-<script>const td=document.getElementById('transfer_department'),tc=document.getElementById('transfer_category');function limitCategories(){for(const o of tc.options){if(!o.value)continue;o.hidden=o.dataset.department!==td.value;o.disabled=o.hidden}if(tc.selectedOptions[0]?.disabled)tc.value=''}td.addEventListener('change',limitCategories);limitCategories();</script>
-@endif
-@if($isAgent)<section class="panel pad mt"><h3><i class="bi bi-clock-history me-2"></i>Historial de actividad</h3><div class="timeline">@foreach($ticket->activities->sortByDesc('id') as $activity)<div><strong>{{ $activity->user->name }}</strong><span>{{ ucfirst(str_replace('_',' ',$activity->action)) }}</span><small>{{ $activity->created_at->format('d/m/Y H:i') }}</small></div>@endforeach</div></section>@endif</aside></div>
+<div class="card shadow-sm mb-3">
+ <div class="card-body">
+  <div class="row g-3 align-items-center">
+   <div class="col-6 col-lg-2"><div class="text-secondary small mb-1">Estado</div><span class="badge {{ $ticket->statusBadgeClass() }}">{{ $ticket->statusLabel() }}</span></div>
+   <div class="col-6 col-lg-2"><div class="text-secondary small mb-1">Prioridad</div><span class="badge {{ $ticket->priorityBadgeClass() }}">{{ $ticket->priorityLabel() }}</span></div>
+   <div class="col-6 col-lg-3"><div class="text-secondary small mb-1">Responsable</div><strong class="small">{{ $ticket->assignee?->name ?? 'Sin asignar' }}</strong></div>
+   <div class="col-6 col-lg-2"><div class="text-secondary small mb-1">Equipo</div><strong class="small">{{ $ticket->team?->name ?? 'Sin equipo' }}</strong></div>
+   <div class="col-12 col-lg-3"><div class="text-secondary small mb-1">Plazo de atención</div>
+    <strong class="small {{ $ticket->due_at && $ticket->due_at->isPast() && !in_array($ticket->status,['resolved','closed']) ? 'text-danger' : '' }}">{{ $ticket->due_at?->format('d/m/Y H:i') ?? 'No definido' }}</strong>
+   </div>
+  </div>
+ </div>
+</div>
+
+<div class="row g-3 align-items-start">
+ <div class="col-12 col-xl-8">
+  <div class="card shadow-sm mb-3">
+   <div class="card-header"><h2 class="card-title fw-semibold"><i class="bi bi-card-text me-2"></i>Descripción</h2></div>
+   <div class="card-body"><p class="mb-0" style="white-space:pre-wrap;overflow-wrap:anywhere">{{ $ticket->description }}</p></div>
+  </div>
+  <div class="card shadow-sm">
+   <div class="card-header"><h2 class="card-title fw-semibold"><i class="bi bi-chat-square-text me-2"></i>Conversación</h2></div>
+   <div class="card-body">
+    @forelse($ticket->messages as $message)
+     <div class="border rounded p-3 mb-3 {{ $message->internal ? 'bg-warning-subtle border-warning-subtle' : 'bg-body-tertiary' }}">
+      <div class="d-flex flex-wrap justify-content-between align-items-center gap-2 mb-2">
+       <div><strong>{{ $message->user->name }}</strong> @if($message->internal)<span class="badge text-bg-warning ms-1">Nota interna</span>@endif</div>
+       <span class="small text-secondary">{{ $message->created_at->format('d/m/Y H:i') }}</span>
+      </div>
+      <p class="mb-0" style="white-space:pre-wrap;overflow-wrap:anywhere">{{ $message->body }}</p>
+     </div>
+    @empty<p class="text-secondary">Todavía no se han registrado respuestas.</p>@endforelse
+    @if($ticket->status !== 'closed')
+    <form method="POST" action="{{ route('tickets.message',$ticket) }}" class="border-top pt-3 mt-3">
+     @csrf
+     <label for="reply_body" class="form-label fw-semibold">Publicar actualización</label>
+     <textarea class="form-control mb-3" id="reply_body" name="body" rows="4" minlength="2" maxlength="10000" placeholder="Escribe una actualización..." required>{{ old('body') }}</textarea>
+     @if($isAgent)<div class="form-check mb-3"><input class="form-check-input" type="checkbox" name="internal" value="1" id="reply_internal"><label class="form-check-label" for="reply_internal">Nota interna (no visible para el solicitante)</label></div>@endif
+     <button class="btn btn-primary" type="submit"><i class="bi bi-send me-1"></i>Publicar respuesta</button>
+    </form>
+    @endif
+   </div>
+  </div>
+ </div>
+ <div class="col-12 col-xl-4">
+  <div class="card shadow-sm mb-3">
+   <div class="card-header"><h2 class="card-title fw-semibold"><i class="bi bi-person-check me-2"></i>Gestión del ticket</h2></div>
+   <div class="card-body">
+    @if($isAgent && $ticket->status !== 'closed')
+    <form method="POST" action="{{ route('tickets.update',$ticket) }}">
+     @csrf @method('PUT')
+     <div class="mb-3"><label class="form-label" for="ticket_status">Estado</label><select class="form-select" name="status" id="ticket_status">@foreach(\App\Models\Ticket::STATUSES as $status)<option value="{{ $status }}" @selected($ticket->status===$status)>{{ \App\Models\Ticket::STATUS_LABELS[$status] }}</option>@endforeach</select></div>
+     <div class="mb-3"><label class="form-label" for="ticket_priority">Prioridad</label><select class="form-select" name="priority" id="ticket_priority">@foreach(\App\Models\Ticket::PRIORITIES as $priority)<option value="{{ $priority }}" @selected($ticket->priority===$priority)>{{ \App\Models\Ticket::PRIORITY_LABELS[$priority] }}</option>@endforeach</select></div>
+     <div class="mb-3"><label class="form-label" for="ticket_team">Equipo</label><select class="form-select" name="team_id" id="ticket_team"><option value="">Sin equipo</option>@foreach($teams as $team)<option value="{{ $team->id }}" @selected($ticket->team_id===$team->id)>{{ $team->name }}</option>@endforeach</select></div>
+     <div class="mb-3"><label class="form-label" for="ticket_assignee">Asignar a</label><select class="form-select" name="assignee_id" id="ticket_assignee"><option value="">Sin asignar</option>@foreach($users as $user)<option value="{{ $user->id }}" @selected($ticket->assignee_id===$user->id)>{{ $user->name }}</option>@endforeach</select></div>
+     <button class="btn btn-primary w-100" type="submit"><i class="bi bi-check2 me-1"></i>Guardar cambios</button>
+    </form>
+    @else
+     <dl class="row mb-0 small"><dt class="col-5 text-secondary">Estado</dt><dd class="col-7">{{ $ticket->statusLabel() }}</dd><dt class="col-5 text-secondary">Responsable</dt><dd class="col-7">{{ $ticket->assignee?->name ?? 'Sin asignar' }}</dd></dl>
+    @endif
+   </div>
+  </div>
+  @if($isAgent && $ticket->status !== 'closed')
+  <div class="card shadow-sm mb-3">
+   <div class="card-header"><h2 class="card-title fw-semibold"><i class="bi bi-arrow-left-right me-2"></i>Transferir solicitud</h2></div>
+   <div class="card-body">
+    <p class="small text-secondary">Conserva el folio y las respuestas públicas. Las notas internas del área anterior permanecen privadas.</p>
+    <form method="POST" action="{{ route('tickets.transfer',$ticket) }}">
+     @csrf
+     <div class="mb-3"><label class="form-label" for="transfer_department">Departamento destino</label><select class="form-select" id="transfer_department" name="department_id" required><option value="">Seleccionar</option>@foreach($departments as $department)<option value="{{ $department->id }}">{{ $department->name }}</option>@endforeach</select></div>
+     <div class="mb-3"><label class="form-label" for="transfer_category">Servicio destino</label><select class="form-select" id="transfer_category" name="ticket_category_id" required><option value="">Selecciona primero un departamento</option>@foreach($categories as $category)<option data-department="{{ $category->department_id }}" value="{{ $category->id }}">{{ $category->name }}</option>@endforeach</select></div>
+     <div class="mb-3"><label class="form-label" for="transfer_reason">Motivo</label><textarea class="form-control" name="reason" id="transfer_reason" rows="3" minlength="10" maxlength="1000" required placeholder="Explica por qué se transfiere..."></textarea></div>
+     <button class="btn btn-outline-primary w-100" type="submit">Transferir solicitud</button>
+    </form>
+   </div>
+  </div>
+  @endif
+  @if($isAgent)
+  <div class="card shadow-sm">
+   <div class="card-header"><h2 class="card-title fw-semibold"><i class="bi bi-clock-history me-2"></i>Historial de actividad</h2></div>
+   <div class="card-body">
+    <div class="border-start ps-3">
+    @forelse($ticket->activities->sortByDesc('id') as $activity)
+     <div class="pb-3 mb-3 border-bottom"><strong class="small d-block">{{ $activity->user->name }}</strong><span class="small">{{ ucfirst(str_replace('_',' ',$activity->action)) }}</span><span class="small d-block text-secondary">{{ $activity->created_at->format('d/m/Y H:i') }}</span></div>
+    @empty<p class="small text-secondary">Sin eventos.</p>@endforelse
+    </div>
+   </div>
+  </div>
+  @endif
+ </div>
+</div>
+<script>
+(function () {
+ const department = document.getElementById('transfer_department'), category = document.getElementById('transfer_category');
+ if(!department || !category) return;
+ function filterCategories(){
+  for(const option of category.options){
+   if(!option.value) continue;
+   const available = option.dataset.department === department.value;
+   option.hidden = !available; option.disabled = !available;
+  }
+  if(category.selectedOptions[0]?.disabled) category.value = '';
+ }
+ department.addEventListener('change',filterCategories);filterCategories();
+})();
+</script>
 @endsection
