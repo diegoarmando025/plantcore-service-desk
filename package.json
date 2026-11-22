@@ -1,0 +1,9 @@
+{
+  "private": true,
+  "description": "Compiled AdminLTE 4 presentation assets for Hostinger",
+  "dependencies": {
+    "admin-lte": "4.10.2",
+    "bootstrap": "5.3.9",
+    "bootstrap-icons": "1.13.2"
+  }
+}
