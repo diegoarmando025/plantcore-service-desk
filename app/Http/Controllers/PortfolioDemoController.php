@@ -12,7 +12,8 @@ use Illuminate\View\View;
 
 class PortfolioDemoController extends Controller {
     public function enter(Request $request): RedirectResponse {
-        $demo = User::query()->where('is_portfolio_demo', true)->where('is_owner', false)
+        $demo = User::query()->where('email', 'portfolio.demo@service-desk.example.invalid')
+            ->where('is_portfolio_demo', true)->where('is_owner', false)
             ->where('active', true)->where('role', 'agent')->get();
         abort_unless($demo->count() === 1, 503, 'Acceso de evaluación no configurado.');
         $user = $demo->first();
