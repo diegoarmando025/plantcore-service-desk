@@ -17,7 +17,7 @@ test -n "$EXPECTED_DB_DATABASE" || { echo "ERROR: set EXPECTED_DB_DATABASE to th
 runtime="$("$PHP_BIN" -r '
 require "vendor/autoload.php";
 $app = require "bootstrap/app.php";
-$app->make(Illuminate\\Contracts\\Console\\Kernel::class)->bootstrap();
+$app->make(Illuminate\Contracts\Console\Kernel::class)->bootstrap();
 $driver = config("database.default");
 $name = config("database.connections." . $driver . ".database");
 $environment = config("app.env");
