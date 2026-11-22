@@ -2,6 +2,14 @@
 
 Multi-department request and ticket tracking for IT, Human Resources, Finance, Purchasing, and Maintenance. An independently developed portfolio application using fictional scenarios, not a commercial multi-tenant SaaS platform.
 
+## Live interactive demo
+
+**[Open Service Desk](https://service-desk.devalejandre.com/login)** and choose **Entrar como administrador demo**. The real Laravel app allows a visitor to create fictional tickets, assign them to five fictional agents, reply, add internal notes, change priorities and statuses, transfer tickets between departments, and see history and dashboard indicators.
+
+All visitors share fictional data in MySQL. An operator-only command can reset demo tickets. Visitor access cannot change user administration or real tickets. This is not a separate app, per-visitor sandbox, or commercial multi-tenant SaaS.
+
+[Interactive reviewer guide](docs/INTERACTIVE_PORTFOLIO_DEMO.md) · [Traceability with REST API](https://traceability.devalejandre.com/login) · [LPA audits](https://lpa.devalejandre.com/login).
+
 ## Current stack
 
 - PHP 8.3+ (Hostinger web runtime must be checked separately from SSH)
@@ -10,7 +18,7 @@ Multi-department request and ticket tracking for IT, Human Resources, Finance, P
 - Blade, AdminLTE 4, Bootstrap 5, Bootstrap Icons
 - PHPUnit feature tests and GitHub Actions
 
-**Deployment discrepancy:** The last reported SSH configuration on 2026-11-22 showed `database.default=sqlite` for Service Desk, as well as Traceability and LPA. Do **not** assume Service Desk is already running MySQL, and do not migrate or switch database drivers before identifying and preserving existing records. An existing SQLite database file does not prove that the web runtime uses SQLite.
+**Hostinger operator verification (2026-11-22):** Laravel CLI reported MySQL as the default driver, six fictional demo users, seven demo tickets, debug off, and the operator confirmed the site loads. Reverify the web runtime and smoke tests after every deployment.
 
 ## Implemented
 
