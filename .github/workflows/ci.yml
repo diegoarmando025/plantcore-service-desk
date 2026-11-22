@@ -23,11 +23,13 @@ jobs:
       - uses: actions/checkout@v4
       - uses: shivammathur/setup-php@v2
         with:
-          php-version: '8.4'
+          php-version: '8.3'
           extensions: mbstring, pdo_mysql, bcmath, xml, ctype, curl, fileinfo, tokenizer
           coverage: none
       - name: Install dependencies
         run: composer install --no-interaction --prefer-dist --no-progress
+      - name: Check platform compatibility
+        run: composer check-platform-reqs
       - name: Check PHP syntax
         run: find app database routes tests -type f -name '*.php' -print0 | xargs -0 -n1 php -l >/dev/null
       - name: Run feature tests on MySQL
