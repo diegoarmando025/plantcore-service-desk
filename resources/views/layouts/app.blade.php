@@ -36,6 +36,7 @@
                     <li class="nav-item"><a href="{{ route('portfolio.guide') }}" class="nav-link {{ request()->routeIs('portfolio.guide') ? 'active' : '' }}"><i class="nav-icon bi bi-map"></i><p>Guía del sistema</p></a></li>
                     <li class="nav-item"><a href="{{ route('dashboard') }}" class="nav-link {{ request()->routeIs('dashboard') ? 'active' : '' }}"><i class="nav-icon bi bi-grid-1x2"></i><p>Panel general</p></a></li>
                     <li class="nav-item"><a href="{{ route('tickets.index') }}" class="nav-link {{ request()->routeIs('tickets.index', 'tickets.show') ? 'active' : '' }}"><i class="nav-icon bi bi-inboxes"></i><p>Solicitudes</p></a></li>
+                    <li class="nav-item"><a href="{{ route('tickets.kanban') }}" class="nav-link {{ request()->routeIs('tickets.kanban','tickets.kanban.move') ? 'active' : '' }}"><i class="nav-icon bi bi-kanban"></i><p>Tablero Kanban</p></a></li>
                     <li class="nav-item"><a href="{{ route('tickets.create') }}" class="nav-link {{ request()->routeIs('tickets.create') ? 'active' : '' }}"><i class="nav-icon bi bi-plus-circle"></i><p>Nueva solicitud</p></a></li>
                     @if(auth()->user()->isAdmin())
                         <li class="nav-header">CONFIGURACIÓN</li>
