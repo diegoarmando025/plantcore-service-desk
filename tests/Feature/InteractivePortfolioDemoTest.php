@@ -79,7 +79,7 @@ class InteractivePortfolioDemoTest extends TestCase {
         $this->get('/login')->assertOk()->assertSee('DevAlejandre_logo.svg')->assertSee('Service Desk')->assertDontSee('PlantCore');
         $this->post('/demo/entrar')->assertRedirect('/guia')->assertSessionHasNoErrors();
         $this->assertAuthenticatedAs($demo);
-        $this->get('/guia')->assertOk()->assertSee('Demo interactiva');
+        $this->get('/guia')->assertOk()->assertSee('Solicitudes internas, de principio a fin');
         $this->get('/dashboard')->assertOk();
         $this->get('/tickets')->assertOk();
         $this->get('/tickets/create')->assertOk();
