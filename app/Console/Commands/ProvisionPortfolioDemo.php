@@ -43,7 +43,7 @@ class ProvisionPortfolioDemo extends Command {
                 $demo = $existing;
                 if (! $demo) {
                     $demo = User::create([
-                        'name' => 'Evaluador PlantCore', 'email' => $email,
+                        'name' => 'Evaluador demo', 'email' => $email,
                         'password' => Str::random(64), 'role' => 'agent', 'active' => true,
                     ]);
                     $demo->forceFill(['is_portfolio_demo' => true])->save();
