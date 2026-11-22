@@ -58,6 +58,30 @@ jobs:
           bash -n scripts/package-hostinger.sh
           bash scripts/package-hostinger.sh "$GITHUB_SHA"
           sha256sum -c "PlantCore_Service_Desk_${GITHUB_SHA:0:12}.zip.sha256"
+      - name: Exercise guarded transfer on disposable SQLite and MySQL
+        env:
+          APP_ENV: testing
+          APP_KEY: base64:AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA=
+          DB_CONNECTION: sqlite
+          DB_URL: ''
+          DB_DATABASE: database/database.sqlite
+          MIGRATION_DB_HOST: 127.0.0.1
+          MIGRATION_DB_PORT: '3306'
+          MIGRATION_DB_NAME: plantcore_service_desk_test
+          MIGRATION_EXPECTED_DATABASE: plantcore_service_desk_test
+          MIGRATION_DB_USER: root
+          MIGRATION_DB_PASSWORD: root
+          MIGRATION_BACKUP_CONFIRMED: 'yes'
+          MIGRATION_ALLOW_WRITE: 'yes'
+        run: |
+          php -l scripts/sqlite-to-mysql.php
+          touch database/database.sqlite
+          php artisan migrate --database=sqlite --force
+          php artisan db:seed --database=sqlite --class=DatabaseSeeder --force
+          php scripts/sqlite-to-mysql.php check
+          php scripts/sqlite-to-mysql.php prepare
+          php scripts/sqlite-to-mysql.php copy
+          php scripts/sqlite-to-mysql.php verify
       - name: Run feature tests on MySQL
         env:
           APP_ENV: testing
