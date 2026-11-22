@@ -117,3 +117,15 @@ a:focus-visible,button:focus-visible,input:focus-visible {outline:3px solid #76a
 .sd-kanban-column .card-body {overflow-wrap:anywhere}
 @media(max-width:1199.98px){.sd-kanban-grid{grid-template-columns:repeat(2,minmax(0,1fr))}}
 @media(max-width:699.98px){.sd-kanban-grid{grid-template-columns:minmax(0,1fr)}}
+
+
+/* Align Service Desk scorecards with DevAlejandre's restrained LPA/Traceability palette. */
+.app-content .small-box {background:#fff!important;color:#203649!important;border:1px solid #dce5eb;border-left:3px solid #315f7e;border-radius:.75rem;box-shadow:0 2px 5px rgba(20,40,60,.04);min-height:115px;}
+.app-content .small-box .inner {padding:1.15rem 1.25rem}
+.app-content .small-box .inner h3 {color:#19374a;font-size:2.2rem;line-height:1.15;font-weight:750;margin-bottom:.45rem}
+.app-content .small-box .inner p {color:#536779;font-size:.85rem;font-weight:650;margin:0}
+.app-content .small-box .small-box-icon {color:#d7e4ee!important;opacity:.9}
+.app-content .small-box.text-bg-info {border-left-color:#0b91a9}
+.app-content .small-box.text-bg-danger {border-left-color:#cf4755}
+.app-content .small-box.text-bg-warning {border-left-color:#d79b2c}
+.app-content .small-box.text-bg-success {border-left-color:#2d8c69}

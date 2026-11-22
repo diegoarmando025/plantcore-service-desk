@@ -31,7 +31,7 @@ Demo visitors share the same sample account and data. Do not enter confidential 
 - Protected owner account and separate access rules for the shared demo dataset
 - Guarded commands to provision and restore fictional sample records
 
-The application is an implementation of a single-organization service desk, not a multi-tenant SaaS product. It does not implement email notifications, subscription billing, or business-hour SLA schedules.
+The current implementation covers ticket intake, assignment, collaboration, department transfers, file evidence, audit history, operational reporting and elapsed-time SLA tracking. Additional workflow requirements and integrations can be scoped per deployment.
 
 ## Architecture
 
