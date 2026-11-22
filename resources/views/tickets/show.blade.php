@@ -5,7 +5,7 @@
  <div>
   <div class="small text-secondary mb-1">{{ $ticket->department->name }} / {{ $ticket->category->name }}</div>
   <h1 class="h4 fw-bold mb-1 text-body">{{ $ticket->title }}</h1>
-  <div class="small text-secondary">Folio {{ $ticket->code }} · Registrado por {{ $ticket->requester->is_portfolio_demo && $ticket->requester->email === 'portfolio.demo@service-desk.example.invalid' ? 'Evaluador demo' : $ticket->requester->name }} el {{ $ticket->created_at->format('d/m/Y H:i') }}</div>
+  <div class="small text-secondary">Folio {{ $ticket->code }} · Registrado por {{ $ticket->requester->name === 'Evaluador PlantCore' ? 'Evaluador demo' : $ticket->requester->name }} el {{ $ticket->created_at->format('d/m/Y H:i') }}</div>
  </div>
  <a class="btn btn-outline-secondary" href="{{ route('tickets.index') }}"><i class="bi bi-arrow-left me-1"></i>Volver a solicitudes</a>
 </div>
@@ -15,7 +15,7 @@
   <div class="row g-3 align-items-center">
    <div class="col-6 col-lg-2"><div class="text-secondary small mb-1">Estado</div><span class="badge {{ $ticket->statusBadgeClass() }}">{{ $ticket->statusLabel() }}</span></div>
    <div class="col-6 col-lg-2"><div class="text-secondary small mb-1">Prioridad</div><span class="badge {{ $ticket->priorityBadgeClass() }}">{{ $ticket->priorityLabel() }}</span></div>
-   <div class="col-6 col-lg-3"><div class="text-secondary small mb-1">Responsable</div><strong class="small">{{ $ticket->assignee?->email === 'portfolio.demo@service-desk.example.invalid' ? 'Evaluador demo' : ($ticket->assignee?->name ?? 'Sin asignar') }}</strong></div>
+   <div class="col-6 col-lg-3"><div class="text-secondary small mb-1">Responsable</div><strong class="small">{{ $ticket->assignee?->name === 'Evaluador PlantCore' ? 'Evaluador demo' : ($ticket->assignee?->name ?? 'Sin asignar') }}</strong></div>
    <div class="col-6 col-lg-2"><div class="text-secondary small mb-1">Equipo</div><strong class="small">{{ $ticket->team?->name ?? 'Sin equipo' }}</strong></div>
    <div class="col-12 col-lg-3"><div class="text-secondary small mb-1">Plazo de atención</div>
     <strong class="small {{ $ticket->due_at && $ticket->due_at->isPast() && !in_array($ticket->status,['resolved','closed']) ? 'text-danger' : '' }}">{{ $ticket->due_at?->format('d/m/Y H:i') ?? 'No definido' }}</strong>
@@ -57,7 +57,7 @@
     @forelse($ticket->messages as $message)
      <div class="border rounded p-3 mb-3 {{ $message->internal ? 'bg-warning-subtle border-warning-subtle' : 'bg-body-tertiary' }}">
       <div class="d-flex flex-wrap justify-content-between align-items-center gap-2 mb-2">
-       <div><strong>{{ $message->user->email === 'portfolio.demo@service-desk.example.invalid' ? 'Evaluador demo' : $message->user->name }}</strong> @if($message->internal)<span class="badge text-bg-warning ms-1">Nota interna</span>@endif</div>
+       <div><strong>{{ $message->user->name === 'Evaluador PlantCore' ? 'Evaluador demo' : $message->user->name }}</strong> @if($message->internal)<span class="badge text-bg-warning ms-1">Nota interna</span>@endif</div>
        <span class="small text-secondary">{{ $message->created_at->format('d/m/Y H:i') }}</span>
       </div>
       <p class="mb-0" style="white-space:pre-wrap;overflow-wrap:anywhere">{{ $message->body }}</p>
@@ -89,7 +89,7 @@
      <button class="btn btn-primary w-100" type="submit"><i class="bi bi-check2 me-1"></i>Guardar cambios</button>
     </form>
     @else
-     <dl class="row mb-0 small"><dt class="col-5 text-secondary">Estado</dt><dd class="col-7">{{ $ticket->statusLabel() }}</dd><dt class="col-5 text-secondary">Responsable</dt><dd class="col-7">{{ $ticket->assignee?->email === 'portfolio.demo@service-desk.example.invalid' ? 'Evaluador demo' : ($ticket->assignee?->name ?? 'Sin asignar') }}</dd></dl>
+     <dl class="row mb-0 small"><dt class="col-5 text-secondary">Estado</dt><dd class="col-7">{{ $ticket->statusLabel() }}</dd><dt class="col-5 text-secondary">Responsable</dt><dd class="col-7">{{ $ticket->assignee?->name === 'Evaluador PlantCore' ? 'Evaluador demo' : ($ticket->assignee?->name ?? 'Sin asignar') }}</dd></dl>
     @endif
    </div>
   </div>
@@ -114,7 +114,7 @@
    <div class="card-body">
     <div class="border-start ps-3">
     @forelse($ticket->activities->sortByDesc('id') as $activity)
-     <div class="pb-3 mb-3 border-bottom"><strong class="small d-block">{{ $activity->user->email === 'portfolio.demo@service-desk.example.invalid' ? 'Evaluador demo' : $activity->user->name }}</strong><span class="small">{{ match($activity->action) { 'created' => 'Solicitud creada', 'updated' => 'Solicitud actualizada', 'status_changed' => 'Estado actualizado', 'assigned' => 'Responsable asignado', 'transferred' => 'Solicitud transferida', 'message_added' => 'Respuesta registrada', default => ucfirst(str_replace('_', ' ', $activity->action)) } }}</span><span class="small d-block text-secondary">{{ $activity->created_at->format('d/m/Y H:i') }}</span></div>
+     <div class="pb-3 mb-3 border-bottom"><strong class="small d-block">{{ $activity->user->name === 'Evaluador PlantCore' ? 'Evaluador demo' : $activity->user->name }}</strong><span class="small">{{ match($activity->action) { 'created' => 'Solicitud creada', 'updated' => 'Solicitud actualizada', 'status_changed' => 'Estado actualizado', 'assigned' => 'Responsable asignado', 'transferred' => 'Solicitud transferida', 'message_added' => 'Respuesta registrada', default => ucfirst(str_replace('_', ' ', $activity->action)) } }}</span><span class="small d-block text-secondary">{{ $activity->created_at->format('d/m/Y H:i') }}</span></div>
     @empty<p class="small text-secondary">Sin eventos.</p>@endforelse
     </div>
    </div>
