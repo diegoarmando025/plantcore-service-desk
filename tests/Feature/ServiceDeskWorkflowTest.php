@@ -67,4 +67,49 @@ class ServiceDeskWorkflowTest extends TestCase {
   $this->assertDatabaseHas('ticket_messages',['ticket_id'=>$t->id,'department_id'=>$dept->id,'internal'=>1]);
  }
 
+
+ public function test_transferred_ticket_rejects_notes_and_updates_from_previous_department():void {
+  extract($this->fixture());
+  $other=Department::create(['code'=>'RH','name'=>'Recursos Humanos']);
+  $rhCategory=TicketCategory::create([
+   'department_id'=>$other->id,'name'=>'Contratos','code'=>'CONTRACT','sla_hours'=>48,
+  ]);
+  $ticket=Ticket::create([
+   'title'=>'Revisión de solicitud','description'=>'Requiere autorización de otra área',
+   'requester_id'=>$requester->id,'department_id'=>$dept->id,
+   'ticket_category_id'=>$category->id,'priority'=>'normal','status'=>'open',
+  ]);
+  $this->actingAs($agent)->post('/tickets/'.$ticket->id.'/transfer',[
+   'department_id'=>$other->id,
+   'ticket_category_id'=>$rhCategory->id,
+   'reason'=>'Esta solicitud corresponde ahora a Recursos Humanos.',
+  ])->assertRedirect('/tickets');
+  $this->actingAs($agent)->post('/tickets/'.$ticket->id.'/messages',[
+   'body'=>'Nota sin acceso','internal'=>1,
+  ])->assertNotFound();
+  $this->actingAs($agent)->put('/tickets/'.$ticket->id,[
+   'status'=>'resolved','priority'=>'high',
+  ])->assertNotFound();
+  $this->assertSame('open',$ticket->fresh()->status);
+  $this->assertDatabaseMissing('ticket_messages',[
+   'ticket_id'=>$ticket->id,'body'=>'Nota sin acceso',
+  ]);
+ }
+
+ public function test_closed_ticket_refuses_new_reply_and_internal_note():void {
+  extract($this->fixture());
+  $ticket=Ticket::create([
+   'title'=>'Caso cerrado','description'=>'Solicitud previamente resuelta',
+   'requester_id'=>$requester->id,'department_id'=>$dept->id,
+   'ticket_category_id'=>$category->id,'status'=>'closed','priority'=>'normal',
+  ]);
+  $this->actingAs($requester)->post('/tickets/'.$ticket->id.'/messages',[
+   'body'=>'Respuesta posterior al cierre',
+  ])->assertStatus(409);
+  $this->actingAs($agent)->post('/tickets/'.$ticket->id.'/messages',[
+   'body'=>'Nota posterior al cierre','internal'=>1,
+  ])->assertStatus(409);
+  $this->assertDatabaseCount('ticket_messages',0);
+ }
+
 }
