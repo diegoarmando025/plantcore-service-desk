@@ -6,4 +6,6 @@
 @if(auth()->user()->isAdmin())<div class="navlabel">CONFIGURACIÓN</div><a class="navlink {{ request()->routeIs('admin.*')?'active':'' }}" href="{{ route('admin.index') }}">⚙ &nbsp; Administración</a>@endif
 <div class="sidebarbottom"><div class="userinitial">{{ strtoupper(substr(auth()->user()->name,0,1)) }}</div><div class="useridentity"><strong>{{ auth()->user()->name }}</strong><small>{{ auth()->user()->role==='admin'?'Administrador':(auth()->user()->role==='agent'?'Agente':'Solicitante') }}</small></div></div></aside>
 <main class="main"><header class="topbar"><div><span class="eyebrow">PLATAFORMA INTERNA</span><h1>@yield('heading','Panel general')</h1></div><div class="topactions"><span>{{ auth()->user()->email }}</span><form method="POST" action="{{ route('logout') }}">@csrf<button class="btn btn-secondary btn-small">Salir</button></form></div></header>
-<div class="container">@if(session('ok'))<div class="alert success">{{ session('ok') }}</div>@endif@if($errors->any())<div class="alert error"><strong>Revisa los datos:</strong><ul>@foreach($errors->all() as $e)<li>{{ $e }}</li>@endforeach</ul></div>@endif@yield('content')</div></main></div></body></html>
+<div class="container">@if(session('ok'))<div class="alert success">{{ session('ok') }}</div>@endif
+@if($errors->any())<div class="alert error"><strong>Revisa los datos:</strong><ul>@foreach($errors->all() as $e)<li>{{ $e }}</li>@endforeach</ul></div>@endif
+@yield('content')</div></main></div></body></html>
