@@ -25,6 +25,25 @@ final class PortfolioDemoScenario {
             ['FIN', 'INVOICE', 'Revisión de factura de proveedor', 'Hay una diferencia entre el importe de la orden de compra y la factura.', 'high', 'resolved'],
             ['COM', 'REQUISITION', 'Requisición de lectores de código de barras', 'Solicitar la compra de lectores para una nueva estación de empaque.', 'normal', 'open'],
             ['MTTO', 'REPAIR', 'Calibración de impresora de etiquetas', 'La impresora Zebra muestra desplazamientos al imprimir etiquetas de producción.', 'high', 'open'],
+
+            ['TI', 'NETWORK', 'Revisar enlace de respaldo en planta', 'Validar la conmutación a enlace secundario durante una interrupción controlada.', 'normal', 'assigned'],
+            ['TI', 'DATABASE', 'Optimizar consulta de inventario', 'La búsqueda de existencias tarda demasiado en el turno nocturno.', 'high', 'resolved'],
+            ['RH', 'CONTRACT', 'Actualizar expediente de ingreso', 'Falta adjuntar documentación del expediente de contratación.', 'normal', 'waiting'],
+            ['RH', 'CONTRACT', 'Validar alta de personal temporal', 'Confirmar el alta administrativa de los colaboradores de temporada.', 'high', 'in_progress'],
+            ['RH', 'CONTRACT', 'Corregir fecha en contrato', 'El contrato de un empleado de prueba muestra una fecha incorrecta.', 'low', 'resolved'],
+            ['RH', 'CONTRACT', 'Confirmar firma de documentos', 'Verificar las firmas pendientes del paquete de ingreso.', 'normal', 'assigned'],
+            ['FIN', 'INVOICE', 'Conciliar gasto de transporte', 'Conciliar la factura de fletes con el registro de viajes.', 'normal', 'in_progress'],
+            ['FIN', 'INVOICE', 'Validar CFDI de servicios', 'Revisar datos fiscales y total de un comprobante ficticio.', 'high', 'assigned'],
+            ['FIN', 'INVOICE', 'Revisar factura duplicada', 'La misma factura aparece dos veces en el listado de revisión.', 'critical', 'open'],
+            ['FIN', 'INVOICE', 'Registrar nota de crédito', 'Procesar una nota de crédito emitida por un proveedor ficticio.', 'low', 'resolved'],
+            ['COM', 'REQUISITION', 'Cotizar consumibles de impresora', 'Solicitar propuestas para el abastecimiento de ribbons y etiquetas.', 'low', 'assigned'],
+            ['COM', 'REQUISITION', 'Aprobar compra de escáneres', 'La solicitud de compra requiere autorización del área responsable.', 'high', 'waiting'],
+            ['COM', 'REQUISITION', 'Seguimiento a entrega de material', 'Confirmar fecha de recepción de consumibles críticos.', 'normal', 'in_progress'],
+            ['COM', 'REQUISITION', 'Cerrar requisición de mobiliario', 'La requisición de mobiliario ya fue atendida y requiere cierre.', 'low', 'resolved'],
+            ['MTTO', 'REPAIR', 'Revisar sensor de línea de empaque', 'El sensor presenta lecturas inconsistentes al iniciar el turno.', 'critical', 'in_progress'],
+            ['MTTO', 'REPAIR', 'Programar inspección de compresor', 'Solicitar inspección preventiva del equipo de aire comprimido.', 'normal', 'assigned'],
+            ['MTTO', 'REPAIR', 'Resolver falla en banda transportadora', 'La banda del transportador tuvo detenciones intermitentes.', 'high', 'resolved'],
+            ['MTTO', 'REPAIR', 'Verificar equipo de respaldo', 'Se requiere confirmar el estado de un dispositivo de respaldo.', 'low', 'waiting'],
         ];
         // Fictional agents can receive assignments, but have random unknown passwords.
         // They never get access to operational tickets or owner permissions.
