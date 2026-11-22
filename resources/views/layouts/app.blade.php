@@ -46,9 +46,6 @@
         </div>
     </aside>
     <main class="app-main">
-        <div class="app-content-header"><div class="container-fluid">
-            <h1 class="h4 mb-0 fw-semibold text-body">@yield('heading', 'Panel general')</h1>
-        </div></div>
         <div class="app-content"><div class="container-fluid service-desk-content">
             @if(auth()->user()->is_portfolio_demo)
               <div class="alert alert-info py-2">Modo evaluación: datos ficticios compartidos entre visitantes. Evita información personal o confidencial. <a href="{{ route('portfolio.guide') }}">Ver recorrido</a></div>
