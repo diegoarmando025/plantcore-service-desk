@@ -114,7 +114,7 @@
    <div class="card-body">
     <div class="border-start ps-3">
     @forelse($ticket->activities->sortByDesc('id') as $activity)
-     <div class="pb-3 mb-3 border-bottom"><strong class="small d-block">{{ $activity->user->email === 'portfolio.demo@service-desk.example.invalid' ? 'Evaluador demo' : $activity->user->name }}</strong><span class="small">{{ ucfirst(str_replace('_',' ',$activity->action)) }}</span><span class="small d-block text-secondary">{{ $activity->created_at->format('d/m/Y H:i') }}</span></div>
+     <div class="pb-3 mb-3 border-bottom"><strong class="small d-block">{{ $activity->user->email === 'portfolio.demo@service-desk.example.invalid' ? 'Evaluador demo' : $activity->user->name }}</strong><span class="small">{{ match($activity->action) { 'created' => 'Solicitud creada', 'updated' => 'Solicitud actualizada', 'status_changed' => 'Estado actualizado', 'assigned' => 'Responsable asignado', 'transferred' => 'Solicitud transferida', 'message_added' => 'Respuesta registrada', default => ucfirst(str_replace('_', ' ', $activity->action)) } }}</span><span class="small d-block text-secondary">{{ $activity->created_at->format('d/m/Y H:i') }}</span></div>
     @empty<p class="small text-secondary">Sin eventos.</p>@endforelse
     </div>
    </div>
