@@ -7,6 +7,7 @@ use App\Http\Controllers\KanbanController;
 use App\Http\Controllers\ReportsController;
 use App\Http\Controllers\AdminController;
 use App\Http\Controllers\PortfolioDemoController;
+use App\Http\Controllers\PortfolioDemoMaintenanceController;
 use Illuminate\Support\Facades\Route;
 Route::redirect('/','/dashboard');
 Route::middleware('guest')->group(function(){
@@ -29,6 +30,7 @@ Route::middleware('auth')->group(function(){
  Route::put('/tickets/{ticket}',[TicketController::class,'update'])->name('tickets.update');
  Route::post('/tickets/{ticket}/transfer',[TicketController::class,'transfer'])->name('tickets.transfer');
  Route::get('/admin',[AdminController::class,'index'])->name('admin.index');
+ Route::post('/admin/portfolio-demo/complete',[PortfolioDemoMaintenanceController::class,'complete'])->middleware('throttle:3,1')->name('admin.portfolio-demo.complete');
  Route::post('/admin/departments',[AdminController::class,'department'])->name('admin.departments.store');
  Route::post('/admin/teams',[AdminController::class,'team'])->name('admin.teams.store');
  Route::post('/admin/categories',[AdminController::class,'category'])->name('admin.categories.store');

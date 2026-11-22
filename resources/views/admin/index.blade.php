@@ -4,6 +4,29 @@
 <div class="d-flex flex-wrap justify-content-between align-items-center gap-2 mb-3">
   <div><h1 class="h4 fw-bold mb-1">Administración</h1><p class="text-secondary mb-0">Departamentos, equipos, servicios y accesos del personal.</p></div>
 </div>
+@if(auth()->user()->is_owner)
+<section class="card shadow-sm mb-3">
+  <div class="card-header"><h2 class="card-title fw-semibold mb-0">Escenario de evaluación</h2></div>
+  <div class="card-body">
+    <div class="d-flex flex-wrap justify-content-between gap-3 align-items-center">
+      <div>
+        <p class="mb-1"><strong>{{ $demoTicketCount }}</strong> solicitudes ficticias registradas</p>
+        <p class="small text-secondary mb-0">Completa los ejemplos preconfigurados sin eliminar ni modificar las solicitudes existentes. Los nuevos tickets se incorporan al escenario compartido.</p>
+      </div>
+      <form method="POST" action="{{ route('admin.portfolio-demo.complete') }}" class="d-flex flex-wrap gap-2 align-items-end">
+        @csrf
+        <div>
+          <label for="demo_confirmation" class="form-label small">Escribe COMPLETAR DEMO</label>
+          <input id="demo_confirmation" name="confirmation" class="form-control" required autocomplete="off" pattern="COMPLETAR DEMO" placeholder="COMPLETAR DEMO" maxlength="14">
+        </div>
+        <button type="submit" class="btn btn-outline-primary">Completar escenario</button>
+      </form>
+    </div>
+    @error('demo_maintenance')<div class="alert alert-danger mt-3 mb-0">{{ $message }}</div>@enderror
+    @error('confirmation')<div class="alert alert-danger mt-3 mb-0">{{ $message }}</div>@enderror
+  </div>
+</section>
+@endif
 <div class="row g-3">
   <div class="col-12 col-xl-6">
     <section class="card shadow-sm h-100"><div class="card-header"><h2 class="card-title fw-semibold">Nuevo departamento</h2></div><div class="card-body">
