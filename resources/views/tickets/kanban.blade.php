@@ -8,9 +8,9 @@
   <a href="{{ route('tickets.create') }}" class="btn btn-primary"><i class="bi bi-plus-lg me-1"></i>Nueva solicitud</a></div>
 </div>
 <p class="small text-secondary mb-3"><i class="bi bi-info-circle me-1"></i>Usa «Cambiar estado» en cada tarjeta. Los tickets cerrados no pueden modificarse. Cada columna muestra hasta 30 tickets recientes.</p>
-<div class="d-flex gap-3 overflow-auto pb-3" aria-label="Tablero Kanban de tickets">
+<div class="sd-kanban-grid" aria-label="Tablero Kanban de tickets">
  @foreach(\App\Models\Ticket::STATUSES as $status)
-  <section class="flex-shrink-0" style="width:min(310px,85vw)" aria-label="{{ \App\Models\Ticket::STATUS_LABELS[$status] }}">
+  <section class="sd-kanban-column" aria-label="{{ \App\Models\Ticket::STATUS_LABELS[$status] }}">
    <div class="card shadow-sm h-100">
     <div class="card-header d-flex align-items-center justify-content-between gap-2">
      <h2 class="h6 fw-semibold mb-0">{{ \App\Models\Ticket::STATUS_LABELS[$status] }}</h2>
@@ -26,7 +26,7 @@
        </div>
        <p class="mb-2 fw-semibold small" style="overflow-wrap:anywhere">{{ $ticket->title }}</p>
        <div class="small text-secondary mb-1"><i class="bi bi-building me-1"></i>{{ $ticket->department?->name ?? 'Sin departamento' }}</div>
-       <div class="small text-secondary mb-2"><i class="bi bi-person me-1"></i>{{ $ticket->assignee?->name ?? 'Sin asignar' }}</div>
+       <div class="small text-secondary mb-2"><i class="bi bi-person me-1"></i>{{ $ticket->assignee?->name === 'Evaluador PlantCore' ? 'Evaluador demo' : ($ticket->assignee?->name ?? 'Sin asignar') }}</div>
        @if($ticket->due_at)
         <div class="small {{ $ticket->due_at->isPast() && !in_array($ticket->status,['resolved','closed']) ? 'text-danger fw-semibold' : 'text-secondary' }} mb-2">
           <i class="bi bi-clock me-1"></i>{{ $ticket->due_at->format('d/m/Y H:i') }}

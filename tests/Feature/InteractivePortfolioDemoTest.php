@@ -194,6 +194,19 @@ class InteractivePortfolioDemoTest extends TestCase {
         $this->assertSame(25,Ticket::where('is_portfolio_demo',true)->count());
     }
 
+    public function test_legacy_demo_identity_is_presented_under_devalejandre(): void {
+        extract($this->fixture());
+        $demo->update(['name' => 'Evaluador PlantCore']);
+        $ticket = Ticket::where('is_portfolio_demo', true)->where('requester_id', $demo->id)->firstOrFail();
+        $this->actingAs($demo)->get('/tickets')->assertOk()
+            ->assertSee('Evaluador demo')->assertDontSee('Evaluador PlantCore');
+        $this->actingAs($demo)->get('/tickets/'.$ticket->id)->assertOk()
+            ->assertSee('Evaluador demo')->assertDontSee('Evaluador PlantCore');
+        $this->actingAs($demo)->get('/tickets/kanban')->assertOk()
+            ->assertDontSee('Evaluador PlantCore');
+        $this->assertSame('Evaluador PlantCore', $demo->fresh()->name);
+    }
+
     public function test_guest_access_refuses_unprovisioned_or_unsafe_account(): void {
         $this->post('/demo/entrar')->assertStatus(503);
         extract($this->fixture());

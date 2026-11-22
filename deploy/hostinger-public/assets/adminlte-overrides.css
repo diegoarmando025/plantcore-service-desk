@@ -108,3 +108,12 @@ body[data-bs-theme="light"]{color-scheme:light}
 a:focus-visible,button:focus-visible,input:focus-visible {outline:3px solid #76a3c4;outline-offset:2px}
 @media(max-width:900px){.da-login-shell{grid-template-columns:1fr}.da-login-story{gap:1.6rem;padding:2rem}.da-login-story h1{font-size:2.2rem;max-width:25ch;margin-bottom:.7rem}.da-login-features{margin-top:1rem}.da-login-panel{padding:1.5rem}}
 @media(max-width:575px){.da-login-story{padding:1.5rem}.da-login-story h1{font-size:1.9rem}.da-login-features{gap:.5rem 1rem}.da-login-panel{padding:1rem}.da-login-form{padding:1.5rem}}
+
+
+/* Portfolio usability: Kanban shows all statuses in a responsive grid instead of clipping columns. */
+.sd-kanban-grid {display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:1rem;align-items:start}
+.sd-kanban-column {min-width:0}
+.sd-kanban-column .card {min-width:0}
+.sd-kanban-column .card-body {overflow-wrap:anywhere}
+@media(max-width:1199.98px){.sd-kanban-grid{grid-template-columns:repeat(2,minmax(0,1fr))}}
+@media(max-width:699.98px){.sd-kanban-grid{grid-template-columns:minmax(0,1fr)}}

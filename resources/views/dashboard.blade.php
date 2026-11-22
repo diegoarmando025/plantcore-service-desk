@@ -47,7 +47,7 @@
    <div class="card-body p-0">
     <ul class="list-group list-group-flush">
     @forelse($workload as $agent)
-      <li class="list-group-item d-flex justify-content-between align-items-center"><span><i class="bi bi-person-circle text-secondary me-2"></i>{{ $agent['name'] }}</span><span class="badge text-bg-primary rounded-pill">{{ $agent['total'] }}</span></li>
+      <li class="list-group-item d-flex justify-content-between align-items-center"><span><i class="bi bi-person-circle text-secondary me-2"></i>{{ $agent['name'] === 'Evaluador PlantCore' ? 'Evaluador demo' : $agent['name'] }}</span><span class="badge text-bg-primary rounded-pill">{{ $agent['total'] }}</span></li>
     @empty
       <li class="list-group-item text-secondary py-4 text-center">No hay tickets activos asignados.</li>
     @endforelse
