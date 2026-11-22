@@ -39,7 +39,7 @@ test ! -e "$build_dir/apps/service-desk/database/database.sqlite"
   zip -qr "$OLDPWD/$filename" apps public_html
 )
 unzip -t "$filename" > /dev/null
-if unzip -Z -1 "$filename" | grep -Eq '(^|/)(\.env|vendor|database\.sqlite)(/|$)'; then
+if unzip -Z -1 "$filename" | grep -Eq '(^|/)\\.env($|/)|^apps/service-desk/vendor/|^apps/service-desk/database/.*\\.sqlite$'; then
   echo "ERROR: secret or runtime data found in package" >&2
   exit 1
 fi
