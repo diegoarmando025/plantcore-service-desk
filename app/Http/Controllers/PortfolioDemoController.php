@@ -31,17 +31,16 @@ class PortfolioDemoController extends Controller {
         $user = $request->user();
         $query = Ticket::query();
         if ($user->is_portfolio_demo) $query->where('is_portfolio_demo', true);
-        elseif (! $user->is_owner) $query->where('is_portfolio_demo', false)
-            ->where(function ($q) use ($user) {
-                $q->where('requester_id', $user->id);
-                if ($user->role === 'agent') {
-                    $ids = $user->departments()->pluck('departments.id');
-                    $q->orWhereIn('department_id', $ids);
-                } elseif ($user->isAdmin()) {
-                    // Ordinary admins see operational tickets but not fictitious demo tickets.
-                    $q->orWhereNotNull('id');
-                }
-            });
+        elseif (! $user->is_owner) {
+            $query->where('is_portfolio_demo', false);
+            if (! $user->isAdmin()) {
+                $ids = $user->departments()->pluck('departments.id');
+                $query->where(function ($q) use ($user, $ids) {
+                    $q->where('requester_id', $user->id);
+                    if ($user->role === 'agent') $q->orWhereIn('department_id', $ids);
+                });
+            }
+        }
         $total = (clone $query)->count();
         $recent = $query->latest('id')->limit(6)->get(['id','code','title','status']);
         return view('portfolio.guide', compact('total', 'recent'));
