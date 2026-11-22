@@ -42,4 +42,4 @@ jobs:
           DB_PASSWORD: root
           SESSION_DRIVER: array
           CACHE_STORE: array
-        run: php artisan test
+        run: vendor/bin/phpunit
