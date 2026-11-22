@@ -11,6 +11,7 @@
     <a class="btn btn-primary" href="{{ route('tickets.create') }}">Crear solicitud</a>
     <a class="btn btn-outline-primary" href="{{ route('tickets.index') }}">Ver tickets demo</a>
     <a class="btn btn-outline-secondary" href="{{ route('dashboard') }}">Ver indicadores</a>
+    <a class="btn btn-outline-success" href="{{ route('reports.index') }}">Reportes y CSV</a>
     <a class="btn btn-outline-primary" href="{{ route('tickets.kanban') }}">Tablero Kanban</a>
   </div>
  </div>
