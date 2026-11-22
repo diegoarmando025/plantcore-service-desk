@@ -32,6 +32,14 @@ jobs:
         run: composer check-platform-reqs
       - name: Check PHP syntax
         run: find app database routes tests -type f -name '*.php' -print0 | xargs -0 -n1 php -l >/dev/null
+      - name: Validate deployment script syntax
+        run: bash -n deploy/deploy-hostinger.sh
+      - name: Validate deployment guard without environment file
+        run: |
+          if bash deploy/deploy-hostinger.sh; then
+            echo 'Expected preflight to refuse missing private configuration'
+            exit 1
+          fi
       - name: Run feature tests on MySQL
         env:
           APP_ENV: testing
