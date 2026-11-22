@@ -19,6 +19,7 @@ class Ticket extends Model {
  public function department():BelongsTo{return $this->belongsTo(Department::class);}
  public function team():BelongsTo{return $this->belongsTo(Team::class);}
  public function category():BelongsTo{return $this->belongsTo(TicketCategory::class,'ticket_category_id');}
+ public function attachments():HasMany{return $this->hasMany(TicketAttachment::class);}
  public function messages():HasMany{return $this->hasMany(TicketMessage::class);}
  public function activities():HasMany{return $this->hasMany(TicketActivity::class);}
 }
