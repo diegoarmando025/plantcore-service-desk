@@ -40,6 +40,15 @@ class TicketController extends Controller {
   abort_unless(Department::whereKey($data['department_id'])->where('active',true)->exists(),422);
   // Initial SLA is elapsed hours, not business hours. This is explicitly labeled in UI.
   $ticket=DB::transaction(function()use($request,$data,$category){
+   if ($request->user()->is_portfolio_demo) {
+    // Lock the shared demo identity to serialize public writes and owner scenario maintenance.
+    User::query()->whereKey($request->user()->id)->lockForUpdate()->firstOrFail();
+    abort_if(
+     Ticket::query()->where('is_portfolio_demo',true)->count() >= 200,
+     429,
+     'El escenario público alcanzó el límite de solicitudes. Intenta más adelante.'
+    );
+   }
    $t=Ticket::create(['title'=>$data['title'],'description'=>$data['description'],'requester_id'=>$request->user()->id,'department_id'=>$data['department_id'],'team_id'=>$category->team_id,'ticket_category_id'=>$category->id,'priority'=>$data['priority'],'status'=>'open','is_portfolio_demo'=>(bool)$request->user()->is_portfolio_demo,'due_at'=>now()->addHours($category->sla_hours)]);
    $t->update(['code'=>'SD-'.str_pad((string)$t->id,6,'0',STR_PAD_LEFT)]);
    $t->activities()->create(['user_id'=>$request->user()->id,'action'=>'created','details'=>['department_id'=>$t->department_id,'category_id'=>$category->id]]);
